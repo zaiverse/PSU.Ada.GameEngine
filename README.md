@@ -21,3 +21,69 @@ Download from https://code.visualstudio.com/ and install
 The command `alr build` will build the project.
 
 The command `alr run` will run the project
+
+## Entity Component System Diagram
+
+
+```mermaid
+classDiagram 
+direction 
+
+namespace ecs {
+    class Entity {
+        +ID
+        +Components[] Components
+    }
+    class Component
+
+    class Transform {
+        +float X
+        +float Y
+        +float Rotation
+    }
+
+    class System
+
+}
+
+namespace ecs-renderer {
+
+    class Polygon
+
+    class PolygonDrawer {
+        -Generate_Polygon_Vertices(Sides, Radius, Center_X, Center_Y, Rotation)
+        -Draw_Regular_Polygon(Image, Polygon)
+    }
+
+}
+
+namespace ecs-physics {
+
+    class Thrust {
+        +Float X
+        +Float Y
+    }
+
+    class Mover {
+        -ApplyThrust(Transform, Thrust)
+    }
+
+}
+
+Component <|.. Thrust
+Mover -- Thrust
+Mover -- Transform
+
+<<interface>> System
+
+Entity --* Component
+Component <|.. Transform
+note for Polygon "Polygon is currently an array of Points, thinking of consolidating Points into transform, but it might make sense to keep separate"
+Transform *.. Polygon
+
+System ..|> PolygonDrawer
+System ..|> Mover
+
+PolygonDrawer -- Polygon
+
+```
