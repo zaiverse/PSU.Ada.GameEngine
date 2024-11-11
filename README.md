@@ -28,61 +28,33 @@ The command `alr run` will run the project
 ```mermaid
 classDiagram
 
-namespace ecs {
-    class Entity {
-        +ID
-        +Components[] Components
-    }
-    class Component
+    ecs.system ..> ecs.component 
+    ecs.entity --*  ecs.component
 
-    class Transform {
-        +float X
-        +float Y
-        +float Rotation
-    }
+    ecs.system <|.. Movement_system
+    ecs.system <|.. Collision_system
+    ecs.system <|.. UserInput_system
+    ecs.system <|.. Render_system
 
-    class System
+    ecs.component <|-- Color
+    ecs.component <|-- UserInput
+    ecs.component <|-- Transform
+    ecs.component <|-- RigidBody
+    ecs.component <|-- Shape
 
-}
+    Movement_system ..> Transform
+    Movement_system ..> RigidBody
+    
+    Collision_system ..> RigidBody
+    Collision_system ..> Transform
+    Collision_system ..> Shape
 
-namespace ecs-renderer {
+    UserInput_system ..> Transform
+    UserInput_system ..> UserInput
 
-    class Polygon
+    Render_system ..> Color
+    Render_system ..> Transform
+    Render_system ..> Shape
 
-    class PolygonDrawer {
-        -Generate_Polygon_Vertices(Sides, Radius, Center_X, Center_Y, Rotation)
-        -Draw_Regular_Polygon(Image, Polygon)
-    }
-
-}
-
-namespace ecs-physics {
-
-    class Thrust {
-        +Float X
-        +Float Y
-    }
-
-    class Mover {
-        -ApplyThrust(Transform, Thrust)
-    }
-
-}
-
-Component <|.. Thrust
-Mover -- Thrust
-Mover -- Transform
-
-<<interface>> System
-
-Entity --* Component
-Component <|.. Transform
-note for Polygon "Polygon is currently an array of Points, thinking of consolidating Points into transform, but it might make sense to keep separate"
-Transform *.. Polygon
-
-System ..|> PolygonDrawer
-System ..|> Mover
-
-PolygonDrawer -- Polygon
 
 ```
