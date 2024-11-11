@@ -1,0 +1,18 @@
+with Ada.Tags; use Ada.Tags;
+
+package ecs.component is 
+
+    type Component_T is tagged null record;
+    type Component_Access is access all Component_T'Class;
+    type Components_T is array (Natural range <>) of Component_Access;
+
+    type Transform_T is new Component_T with record
+        X, Y : Float;
+        Rotation : Float;
+    end record;
+
+    type Rigidbody_T is new Component_T with record
+        Mass : Float;
+    end record;
+
+end ecs.component;

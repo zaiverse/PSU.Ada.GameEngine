@@ -26,8 +26,7 @@ The command `alr run` will run the project
 
 
 ```mermaid
-classDiagram 
-direction 
+classDiagram
 
 namespace ecs {
     class Entity {
