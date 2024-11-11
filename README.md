@@ -28,7 +28,15 @@ The command `alr run` will run the project
 ```mermaid
 classDiagram
 
+    direction LR
+
+    Game --* SceneManager
+    SceneManager --* Scene
+    Scene --* ecs.entity
+
     ecs.system ..> ecs.component 
+    <<interface>> ecs.system
+
     ecs.entity --*  ecs.component
 
     ecs.system <|.. Movement_system
