@@ -18,9 +18,9 @@ Download from https://code.visualstudio.com/ and install
 
 ## Running the application
 
-The command `alr build` will build the project.
+The command `gprbuild` will build the project.
 
-The command `alr run` will run the project
+The command `obj\gameengine` will run the project on Linux, `. obj\gameengine.exe` on Windows.
 
 ## Entity Component System Diagram
 
