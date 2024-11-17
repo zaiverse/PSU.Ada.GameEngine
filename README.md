@@ -14,7 +14,9 @@ Download from https://code.visualstudio.com/ and install
 
 ### Clone the repo
 
-`git clone mailto:git@github.com:apostasy/PSU.Ada.GameEngine.git`
+This repository: `git clone mailto:git@github.com:apostasy/PSU.Ada.GameEngine.git`
+
+This project relies on the [portable_window repository](https://github.com/ohenley/portable_window).
 
 ## Running the application
 
