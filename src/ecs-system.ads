@@ -1,5 +1,6 @@
 with ecs.component; use ecs.component;
 with ecs.entity; use ecs.entity;
+with ecs.event_manager; use ecs.event_manager;
 with Ada.Tags; use Ada.Tags;
 
 package ecs.system is
