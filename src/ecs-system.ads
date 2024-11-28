@@ -3,6 +3,7 @@ with ECS.Entity; use ECS.Entity;
 with Ada.Tags; use Ada.Tags;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 package ECS.System is
+package ECS.System is
 
    type System_T is interface;
 

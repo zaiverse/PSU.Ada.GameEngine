@@ -2,7 +2,6 @@ with ecs.component; use ecs.component;
 with Ada.Tags; use Ada.Tags;
 with Ada.Containers.Vectors;
 
-
 package ecs.entity is 
 
     subtype Id_T is String (1 .. 5);
