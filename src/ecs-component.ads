@@ -1,6 +1,6 @@
 with Ada.Tags; use Ada.Tags;
 
-package ecs.component is 
+package ECS.Component is 
 
     type Component_T is tagged null record;
     type Component_Access is access all Component_T'Class;
@@ -8,6 +8,7 @@ package ecs.component is
 
     type Transform_T is new Component_T with record
         X, Y : Float;
+        VX,VY : Float;
         Rotation : Float;
     end record;
 
@@ -16,11 +17,19 @@ package ecs.component is
     end record;
     -- Axis aligned bounding box for collision detection between objects
     type AABB_T is new Component_T with record
-        MinX : Float;
-        MinY : Float;
-        MaxX : Float;
-        MaxY : Float;
+        Left : Float;
+        Bottom : Float;
+        Right : Float;
+        Top : Float;
+    end record;
+
+    type Collision_Params_T is new Component_T with record
+      Collision_Enabled : Boolean;
+      Destroy_On_Collision : Boolean;
+      -- Change in velocity if Destroy_On_Collision is false
+      Delta_VX : Float; 
+      Delta_VY : Float; 
     end record;
 
     
-end ecs.component;
+end ECS.Component;
