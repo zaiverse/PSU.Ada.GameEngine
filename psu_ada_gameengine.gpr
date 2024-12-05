@@ -7,7 +7,8 @@ project Psu_Ada_Gameengine is
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "bin";
    for Main use ("psu_ada_gameengine.adb", "ecs_tests.adb", "ecs_vec2_tests.adb", "ecs_entity_component_tests.adb"
-                  , "ecs_entity_manager_tests.adb", "ecs_systems_tests.adb", "ecs_integration_test_one.adb");
+                  , "ecs_entity_manager_tests.adb", "ecs_systems_tests.adb", "ecs_integration_test_one.adb"
+                  , "ecs_window_system_integration_test.adb");
 
    package Compiler is
       for Default_Switches ("Ada") use Psu_Ada_Gameengine_Config.Ada_Compiler_Switches & ("-gnat2022");

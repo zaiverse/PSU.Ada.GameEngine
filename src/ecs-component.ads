@@ -1,5 +1,6 @@
 with Ada.Tags; use Ada.Tags;
 with ECS.Vec2;
+with ECS.Color; use ECS.Color;
 
 package ECS.Component is 
 
@@ -34,5 +35,10 @@ package ECS.Component is
         Bottom_Bound : Boolean;
     end record;
 
+   type Shape_T is new Component_T with record
+      Sides    : Positive;
+      Radius   : Positive;
+      C        : ECS.Color.Color;
+   end record;
     
 end ECS.Component;

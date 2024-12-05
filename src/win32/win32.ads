@@ -58,6 +58,7 @@ package Win32 is
 
    type Byte is mod 2**8 with size => 8; 
    type Byte_Array is array (Natural range <>) of Byte;
+   type Byte_Array_Access is access Byte_Array;
 
    type ATOM is new IC.unsigned_short;
 

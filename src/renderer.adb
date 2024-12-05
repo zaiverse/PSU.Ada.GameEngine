@@ -26,10 +26,10 @@ package body renderer is
      (img : in out Byte_Array; x : natural; y : natural; c : color; Width : Natural) is
      Index : Natural := (y * Width + x ) * 4;
    begin
-      Img(Index)     := Byte(Integer(C.B * 255.0));
-      Img(Index + 1) := Byte(Integer(C.G * 255.0));
-      Img(Index + 2) := Byte(Integer(C.R * 255.0));
-      Img(Index + 3) := Byte(Integer(C.A * 255.0));
+      Img(Index)     := Byte(C.B);
+      Img(Index + 1) := Byte(C.G);
+      Img(Index + 2) := Byte(C.R);
+      Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
    procedure Clear_Screen ( img : in out Byte_Array; c : color; Width : Natural; Height : Natural) is
