@@ -6,12 +6,13 @@ with Win32; use Win32;
 with System;
 with Renderer; use Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
+with ECS.Color; use ECS.Color;
 procedure Psu_Ada_Gameengine is
 Title : Unbounded_String := To_Unbounded_String("Game Window");
 GameWindow : Window_Access;
 Buffer : Win32.Byte_Array(0 .. 800 * 600 * 4) := (others => 0);
-Red  : Color := (R => Max, G => 0.0, B => 0.0, A => Max);
-SkyBlue : Color := (R => 0.2, G => 0.3, B => 0.36, A => Max);
+
+SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
 
 Start_Time, Stop_Time : Time;
 Elapsed_Time          : Time_Span;
@@ -37,10 +38,10 @@ begin
                --  Process_Events(Manager.all);
       if To_Duration(Elapsed_Time) > 1.0/60.0 then
          Clear_Screen(Buffer, SkyBlue, 800, 600);
-         Draw_Regular_Polygon(Buffer, 20, 50, 50.0 + Counter, 50.0 + Counter, Red, 800);
+         Draw_Regular_Polygon(Buffer, 20, 50, 50.0 + Counter, 50.0, ECS.Color.Red, 800);
          GameWindow.Draw_Buffer(Buffer'Address);
          Start_Time := Clock;
-         Counter := Counter + 0.0;
+         Counter := Counter + 50.0;
       end if;
       end loop;
    end;
