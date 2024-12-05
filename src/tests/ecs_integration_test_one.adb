@@ -71,8 +71,6 @@ begin
    E1.all.Add_Component(Rigidbody_E1);
    E1.all.Add_Component(AABB_E1);
    E1.all.Add_Component(Collision_Params_E1);
-
-
    Manager.all.Update; 
 
    -- Get the unit vector for the direction to move Player
