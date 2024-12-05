@@ -303,5 +303,9 @@ package Win32 is
    function GetDC (H_Wnd : HWND) return HDC
    with Import => True, Convention => C, External_Name => "GetDC";
 
+   function ReleaseDC
+  (H_Wnd : HWND;
+   H_Dc  : HDC) return Boolean
+   with Import => True, Convention => C, External_Name => "ReleaseDC";
 
 end Win32;

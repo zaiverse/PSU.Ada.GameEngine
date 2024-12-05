@@ -1,4 +1,4 @@
-with System;
+with System; use System;
 with Interfaces.C;
 with Interfaces.C.Strings;
 with Ada.Unchecked_Conversion;
@@ -124,10 +124,9 @@ package body Window is
    procedure Draw_Buffer(Window : in out Window_T; Buffer : System.Address) is
       Bmi_Reset : Byte_Array (0 .. BITMAPINFO'Size / 8 - 1) := (others => 0);
       Bmi : aliased BITMAPINFO with Address => Bmi_Reset'Address;
-
       Result : Interfaces.C.int;
+      Handle_DC : HDC := GetDC(Window.Handle);
    begin
-
       Bmi.bmiHeader.biSize            := BITMAPINFOHEADER'Size / 8;
       Bmi.bmiHeader.biWidth           := Window.Width;   
       Bmi.bmiHeader.biHeight          := -Window.Height;
@@ -141,7 +140,7 @@ package body Window is
       Bmi.bmiHeader.biClrImportant    := 0;
 
       Result := Stretch_DIBits(
-         H_Dc           => GetDC(Window.Handle),
+         H_Dc           => Handle_DC,
          X_Dest         => 0,
          Y_Dest         => 0,
          Dest_Width     => Window.Width,
@@ -156,9 +155,20 @@ package body Window is
          Rop            => SRCCOPY
       );
 
+      -- Release the HDC to avoid memory leak
+      if Handle_DC /= Null_Address then
+         declare
+            Result_Release : Boolean := ReleaseDC(Window.Handle, Handle_DC);
+         begin
+            if not Result_Release then
+               Put_Line("Failed to release HDC.");
+            end if;
+         end;
+      end if;
+
+      -- Check for drawing failure
       if Result = 0 then
          Put_Line("StretchDIBits failed.");
       end if;
    end Draw_Buffer;
-
 end Window;

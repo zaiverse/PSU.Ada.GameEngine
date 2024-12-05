@@ -32,12 +32,15 @@ package Renderer is
    end record;
    for color use
      record
-       b at 0 range 0 .. 7;
+       r at 0 range 0 .. 7;
        g at 1 range 0 .. 7;
-       r at 2 range 0 .. 7;
+       b at 2 range 0 .. 7;
        a at 3 range 0 .. 7;
      end record;
    for color'Size use Interfaces.C.unsigned_long'size;
+
+   procedure Clear_Screen
+      (img : in out Byte_Array; c : color; Width : Natural; Height : Natural);
 
    procedure set_pixel_color
      (img : in out Byte_Array; x : natural; y : natural; c : color; Width : Natural);

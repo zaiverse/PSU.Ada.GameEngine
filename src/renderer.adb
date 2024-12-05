@@ -20,18 +20,26 @@ package body renderer is
    begin
       x := y;
       y := tmp;
-   end;
-
+   end generic_swap;
+   
    procedure set_pixel_color
      (img : in out Byte_Array; x : natural; y : natural; c : color; Width : Natural) is
      Index : Natural := (y * Width + x ) * 4;
    begin
+      Img(Index)     := Byte(Integer(C.B * 255.0));
+      Img(Index + 1) := Byte(Integer(C.G * 255.0));
+      Img(Index + 2) := Byte(Integer(C.R * 255.0));
+      Img(Index + 3) := Byte(Integer(C.A * 255.0));
+   end set_pixel_color;
 
-      img(Index)     := Byte(c.r) * 255;
-      img(Index + 1) := Byte(c.g) * 255;
-      img(Index + 2) := Byte(c.b) * 255;
-      img(Index + 3) := Byte(c.a) * 255;
-   end;
+   procedure Clear_Screen ( img : in out Byte_Array; c : color; Width : Natural; Height : Natural) is
+   begin
+      for Y in 0 .. Height - 1 loop
+         for X in 0 .. Width - 1 loop
+            set_pixel_color(img, X, Y, c, Width);
+         end loop;
+      end loop;
+   end Clear_Screen;
 
    procedure line
      (x0  : in out natural;
