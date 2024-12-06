@@ -17,7 +17,7 @@ package ECS.Event is
    end record;
 
    -- Event types
-   type EventType_T is (NoEvent, KeyPress, MouseClick);
+   type EventType_T is (NoEvent, KeyDown, KeyUp, L_MouseDown, L_MouseUp, MouseMove);
 
    -- Define the event structure
    type Event_T is record
@@ -32,5 +32,6 @@ package ECS.Event is
    -- Abstract procedures for platform-specific behavior
    procedure Emit_Event (Handler : in out Event_Handler; Event : Event_T) is abstract;
    procedure Process_Events (Handler : in out Event_Handler) is abstract;
+   function Get_Next_Event (Handler : in out Event_Handler) return Event_T is abstract;
 
 end ECS.Event;

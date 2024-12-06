@@ -34,7 +34,21 @@ package body Window is
             KeyCode : ECS.Event.Byte := ECS.Event.Byte(W_Param);
             Event   : ECS.Event.Event_T :=
             (Source    => 0,
-               EventType => ECS.Event.KeyPress,
+               EventType => ECS.Event.KeyDown,
+               Data      => (KeyCode    => KeyCode,
+                           MouseX     => 0,
+                           MouseY     => 0,
+                           Additional => (others => 0)));
+         begin
+            Emit_Event(Manager, Event);
+         end;
+
+         when WM_KEYUP =>
+         declare
+            KeyCode : ECS.Event.Byte := ECS.Event.Byte(W_Param);
+            Event   : ECS.Event.Event_T :=
+            (Source    => 0,
+               EventType => ECS.Event.KeyUp,
                Data      => (KeyCode    => KeyCode,
                            MouseX     => 0,
                            MouseY     => 0,
@@ -50,7 +64,7 @@ package body Window is
             MouseY    : Integer := Integer((L_Param_U / 16#10000#) and 16#FFFF#);
             MouseEvent : ECS.Event.Event_T :=
               (Source    => 0,
-               EventType => ECS.Event.MouseClick,
+               EventType => ECS.Event.L_MouseDown,
                Data      => (KeyCode    => 0,
                              MouseX     => MouseX,
                              MouseY     => MouseY,
@@ -59,7 +73,42 @@ package body Window is
             Emit_Event(Manager, MouseEvent);
          end;
 
-
+         when WM_LBUTTONUP =>
+         declare
+            L_Param_U : Interfaces.C.unsigned_long := Interfaces.C.unsigned_long(L_Param);
+            MouseX    : Integer := Integer(L_Param_U and 16#FFFF#);
+            MouseY    : Integer := Integer((L_Param_U / 16#10000#) and 16#FFFF#);
+            MouseEvent : ECS.Event.Event_T :=
+              (Source    => 0,
+               EventType => ECS.Event.L_MouseUp,
+               Data      => (KeyCode    => 0,
+                             MouseX     => MouseX,
+                             MouseY     => MouseY,
+                             Additional => (others => 0)));
+         begin
+            Emit_Event(Manager, MouseEvent);
+         end;
+         when WM_MOUSEMOVE =>
+         declare
+            L_Param_U : Interfaces.C.unsigned_long := Interfaces.C.unsigned_long(L_Param);
+            MouseX    : Integer := Integer(L_Param_U and 16#FFFF#);
+            MouseY    : Integer := Integer((L_Param_U / 16#10000#) and 16#FFFF#);
+         begin
+            -- Emit the event only if a mouse button is pressed
+            if (W_Param and (MK_LBUTTON or MK_RBUTTON or MK_MBUTTON)) /= 0 then
+               declare
+                  MouseEvent : ECS.Event.Event_T :=
+                  (Source    => 0,
+                   EventType => ECS.Event.MouseMove,
+                   Data      => (KeyCode    => 0,
+                             MouseX     => MouseX,
+                             MouseY     => MouseY,
+                             Additional => (others => 0)));
+               begin
+                  Emit_Event(Manager, MouseEvent);
+               end;
+            end if;
+         end;
          when others =>
             return Def_Window_Proc(H_Wnd, Msg, W_Param, L_Param);
       end case;
@@ -171,4 +220,5 @@ package body Window is
          Put_Line("StretchDIBits failed.");
       end if;
    end Draw_Buffer;
+
 end Window;

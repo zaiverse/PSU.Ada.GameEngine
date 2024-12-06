@@ -14,6 +14,8 @@ package Win32 is
    WM_DESTROY : constant := 16#2#;
    WM_PAINT : constant := 16#f#;
    WM_QUIT : constant := 16#0012#;
+   WM_SETCURSOR : constant := 16#20#;  -- Define the set cursor message
+   HTCLIENT : constant := 16#01#;  -- Hit-test value for the client area
    COLOR_BACKGROUND : constant := 1;
    BLACK_BRUSH : constant := 4;
 
@@ -27,8 +29,18 @@ package Win32 is
 
    -- Key constants
    WM_KEYDOWN : constant := 16#100#;  -- Define the key-down message
+   WM_KEYUP : constant := 16#101#;    -- Define the key-up message
    WM_LBUTTONDOWN : constant := 16#201#;  -- Define the left mouse button down message
+   WM_LBUTTONUP : constant := 16#202#;  -- Left mouse button up
+   WM_MOUSEMOVE : constant := 16#200#;  -- Mouse move message
 
+   MK_LBUTTON : constant := 1;          -- Left mouse button
+   MK_RBUTTON : constant := 2;          -- Right mouse button
+   MK_SHIFT   : constant := 4;          -- SHIFT key
+   MK_CONTROL : constant := 8;          -- CTRL key
+   MK_MBUTTON : constant := 16;         -- Middle mouse button
+   MK_XBUTTON1 : constant := 32;        -- X1 mouse button (extra button)
+   MK_XBUTTON2 : constant := 64;        -- X2 mouse button (extra button)
 
    type LPCSTR is access constant IC.char;
    type LPSTR is access all IC.char;
@@ -308,5 +320,6 @@ package Win32 is
   (H_Wnd : HWND;
    H_Dc  : HDC) return Boolean
    with Import => True, Convention => C, External_Name => "ReleaseDC";
+
 
 end Win32;

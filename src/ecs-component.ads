@@ -40,5 +40,5 @@ package ECS.Component is
       Radius   : Positive;
       C        : ECS.Color.Color;
    end record;
-    
+  
 end ECS.Component;
