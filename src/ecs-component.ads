@@ -40,9 +40,5 @@ package ECS.Component is
       Radius   : Positive;
       C        : ECS.Color.Color;
    end record;
-
-   type Input_T is new Component_T with record
-      Up_Pressed : Boolean;
-   end record;
-    
+  
 end ECS.Component;
