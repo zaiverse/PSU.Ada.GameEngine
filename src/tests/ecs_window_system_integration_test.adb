@@ -8,6 +8,8 @@ with Renderer; use Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
 with ECS.Color; use ECS.Color;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
+with ECS.Event; use ECS.Event;
+with ECS.Event_Manager; use ECS.Event_Manager;
 with ECS.Vec2; use ECS.Vec2;
 with ECS.System; use ECS.System;
 with ECS.Entity; use ECS.Entity;
@@ -24,7 +26,7 @@ Elapsed_Time          : Time_Span;
 -- Entity Manager and Entities
 Manager : Manager_Access := new Entity_Manager_T'(Entities => Entity_List.Empty_Vector, 
                                                    ToBeAdded => Entity_List.Empty_Vector);
-
+Event_Mgr : ECS.Event_Manager.Platform_Event_Handler_Access := new Platform_Event_Handler;
 Player : Entity_Access := Manager.all.AddEntity("Playr");
 E1 : Entity_Access := Manager.all.AddEntity("E0001");
 
@@ -32,8 +34,9 @@ E1 : Entity_Access := Manager.all.AddEntity("E0001");
 Mover : Mover_T;
 Collision : Collision_T;
 Render : Render_T := (800,Buffer);
+UserInput : User_Input_T := (Player, Event_Mgr, False, True);
 -- Player components
-Transform_P : Component_Access := new Transform_T'(Position => (X => 50.0, Y => 500.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
+Transform_P : Component_Access := new Transform_T'(Position => (X => 400.0, Y => 300.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
 T_P : Transform_T renames Transform_T(Transform_P.all);
 Rigidbody_P : Component_Access := new Rigidbody_T'(Mass => 1.0);
 AABB_P      : Component_Access := new AABB_T'(
@@ -42,7 +45,7 @@ AABB_P      : Component_Access := new AABB_T'(
    Right => T_P.Position.X + 5.0, 
    Top => T_P.Position.Y);
 Collision_Params_P : Component_Access := new Collision_Params_T'(
-   Collision_Enabled => True,
+   Collision_Enabled => False,
    Collision_Occurred => False,
    Destroy_On_Collision => True,
    Left_Bound => False,
@@ -79,13 +82,10 @@ Collision_Params_E1 : Component_Access := new Collision_Params_T'(
 C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 
 Shape_E1 : Component_Access := new Shape_T'(
-   Sides => 5,
+   Sides => 4,
    Radius => 25,
    C => (R => 255, G => 0, B => 0, A => 255)
 );
-
-Direction : Vec2 := T_E1.Position - T_P.Position;
-
 
 
 begin
@@ -106,15 +106,8 @@ begin
 
    GameWindow := New_Window(800,600,Title);
    Put_Line ("Start Engine");
+ 
 
-   Normalize(Direction);
-   -- Set the speed
-   Scale(Direction, 40.0);
-   Put_Line("Player moving in direction " & Direction'Image);
-   -- Assign new velocity vector to player
-   -- Dummy comment
-   T_P.Velocity.X := Direction.X;
-   T_P.Velocity.Y := Direction.Y;
 
    declare
       Message        : MSG_Access := new MSG;
@@ -122,20 +115,21 @@ begin
       Lp_Result      : LRESULT;
    begin
       while Has_Msg loop
-      Stop_Time := Clock;
-      Elapsed_Time := Stop_Time - Start_Time;
-      Start_Time := Stop_Time;
-      Lp_Result := Dispatch_Message (Message);
-      Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
+         Stop_Time := Clock;
+         Elapsed_Time := Stop_Time - Start_Time;
+         Start_Time := Stop_Time;
+         Lp_Result := Dispatch_Message (Message);
+         Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
 
-               --  -- Process emitted events here
-               --  Process_Events(Manager.all);
-      Manager.all.update;
-      Clear_Screen(Buffer.all, ECS.Color.Black, 800, 600);
-      Mover.Execute(To_Duration(Elapsed_Time), Manager);
-      Collision.Execute(To_Duration(Elapsed_Time),Manager);
-      Render.Execute(To_Duration(Elapsed_Time), Manager);
-      GameWindow.Draw_Buffer(Buffer.all'Address);
+         -- Process emitted events here - for debug purposes
+         --Process_Events(Event_Mgr.all);
+         Manager.all.update;
+         Clear_Screen(Buffer.all, ECS.Color.Black, 800, 600);
+         UserInput.Execute(To_Duration(Elapsed_Time), Manager);
+         Mover.Execute(To_Duration(Elapsed_Time), Manager);
+         Collision.Execute(To_Duration(Elapsed_Time),Manager);
+         Render.Execute(To_Duration(Elapsed_Time), Manager);
+         GameWindow.Draw_Buffer(Buffer.all'Address);
       end loop;
    end;
 end ECS_Window_System_Integration_Test;

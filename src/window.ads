@@ -14,6 +14,7 @@ package Window is
    procedure Draw_Buffer(Window: in out Window_T; Buffer : System.Address);
    function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access;
 
+
 private
    type Window_T is tagged record
       Height : Interfaces.C.int;

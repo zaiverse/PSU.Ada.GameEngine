@@ -24,4 +24,29 @@ package body ECS.Event_Manager is
          Put_Line ("Processing Event: " & Current_Event'Image);
       end loop;
    end Process_Events;
+
+   -- Function to return the next event in the queue
+   overriding function Get_Next_Event(Handler : in out Platform_Event_Handler) return Event_T is
+      Null_Event : Event_T := (
+         Source => 0,
+         EventType => NoEvent,
+            Data        => (
+            KeyCode     => 0,
+            MouseX      => 0,
+            MouseY      => 0,
+            Additional  => (others => 0)
+         )
+      );
+   begin
+      if not Event_Queue.Is_Empty then
+         declare
+            First_Event : Event_T := Event_Queue.First_Element;
+         begin
+            Event_Queue.Delete_First;
+            return First_Event;
+         end;
+      else
+         return Null_Event;
+      end if;
+   end Get_Next_Event;
 end ECS.Event_Manager;
