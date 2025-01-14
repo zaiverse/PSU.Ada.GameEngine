@@ -1,121 +1,92 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with ecs.entity; use ecs.entity;
-with ecs.component; use ecs.component;
-with ecs.entity_manager; use ecs.entity_manager;
-with ecs.system; use ecs.system;
+with Entities;
+with Components;
+with Position_Component;
+with Shape_Component;
+with Systems;
+with Render_System;
+with Bitmap;
+with Math;
+with Window;
+with Shapes;
 
-procedure ECS_Tests is
+procedure ECS_Test is
+   -- Entity Manager
+   Entity_Manager_Instance : Entities.Entity_Manager;
 
-   Manager : Manager_Access := new Entity_Manager_T'(Entities => Entity_List.Empty_Vector, 
-                                                   ToBeAdded => Entity_List.Empty_Vector);
-   Player : Entity_Access := Manager.all.AddEntity("Playr");
-   E1 : Entity_Access := Manager.all.AddEntity("E0001");
-   E2 : Entity_Access := Manager.all.AddEntity("E0002");
-   E3 : Entity_Access := Manager.all.AddEntity("E0003");
-   Mover : Mover_T;
-   Collision : Collision_T;
-   Transform_P : Component_Access := new Transform_T'(X => 1.0, Y => 2.0, VX => 2.0, VY => 0.0, Rotation => 0.0);
-   T_P : Transform_T renames Transform_T(Transform_P.all);
-   Rigidbody_P : Component_Access := new Rigidbody_T'(Mass => 1.0);
-   AABB_P      : Component_Access := new AABB_T'(
-      Left => T_P.X, 
-      Bottom => T_P.Y + 5.0, 
-      Right => T_P.X + 5.0, 
-      Top => T_P.Y);
-   
-   Transform_E1 : Component_Access := new Transform_T'(X => 7.0, Y => 2.0,VX => 0.0, VY => 0.0, Rotation => 0.0);
-   T_E1 : Transform_T renames Transform_T(Transform_E1.all);
-   Rigidbody_E1 : Component_Access := new Rigidbody_T'(Mass => 1.0);
-   AABB_E1      : Component_Access := new AABB_T'(
-      Left => T_E1.X, 
-      Bottom => T_E1.Y + 5.0, 
-      Right => T_E1.X + 5.0, 
-      Top => T_E1.Y);
+   -- Component Manager
+   Component_Manager_Instance : Components.Component_Manager;
 
-   Transform_E2 : Component_Access := new Transform_T'(X => 15.0, Y => 2.0, VX => 0.0, VY => 0.0, Rotation => 0.0);
-   T_E2 : Transform_T renames Transform_T(Transform_E2.all);
-   Rigidbody_E2 : Component_Access := new Rigidbody_T'(Mass => 1.0);
-   AABB_E2      : Component_Access := new AABB_T'(
-      Left => T_E2.X, 
-      Bottom => T_E2.Y + 5.0, 
-      Right => T_E2.X + 5.0, 
-      Top => T_E2.Y);
+   -- System Manager
+   System_Manager_Instance : Systems.System_Manager;
 
-   Transform_E3 : Component_Access := new Transform_T'(X => 21.0, Y => 2.0, VX => 0.0, VY => 0.0, Rotation => 0.0);
-   T_E3 : Transform_T renames Transform_T(Transform_E3.all);
-   Rigidbody_E3 : Component_Access := new Rigidbody_T'(Mass => 1.0);
-   AABB_E3      : Component_Access := new AABB_T'(
-      Left => T_E3.X, 
-      Bottom => T_E3.Y + 5.0, 
-      Right => T_E3.X + 5.0, 
-      Top => T_E3.Y);
-   begin
-      Put_Line("Running Tests");
+   -- Render System
+   Render_System_Instance : aliased Render_System.Renderer_Impl;
 
-      Player.all.Add_Component(Transform_P);
-      Player.all.Add_Component(Rigidbody_P);
-      Player.all.Add_Component(AABB_P);
-      E1.all.Add_Component(Transform_E1);
-      E1.all.Add_Component(Rigidbody_E1);
-      E1.all.Add_Component(AABB_E1);
-      E2.all.Add_Component(Transform_E2);
-      E2.all.Add_Component(Rigidbody_E2);
-      E2.all.Add_Component(AABB_E2);
-      E3.all.Add_Component(Transform_E3);
-      E3.all.Add_Component(Rigidbody_E3);
-      E3.all.Add_Component(AABB_E3);
+   -- Window (Assuming a Window package is available)
+   Window_Instance : aliased Window.Window_Type'Class;
 
-      Manager.all.Update;  
-      -- 1/60 of a second after program launch
-      Put_Line("Calling Mover");
-      Execute (Mover,1.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
-      -- 2/60 of a second after the last frame
+   -- Entity
+   Entity_Instance : Entities.Entity_Id;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   --  -- Position Component
+   --  Position_Instance : aliased Position_Component.Position_Component;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   --  -- Shape Component
+   --  Shape_Instance : aliased Shape_Component.Shape_Component;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Position Component
+   Position_Instance : Position_Component.Position_Component_Access  := new Position_Component.Position_Component;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Shape Component
+   Shape_Instance : Position_Component.Position_Component_Access  := new Shape_Component.Shape_Component;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Polygon Shape
+   Polygon_Shape_Instance : aliased Shapes.Polygon;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Screen dimensions
+   Screen_Width  : constant Positive := 800;
+   Screen_Height : constant Positive := 600;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+begin
+   -- Initialize Managers
+   Entities.Initialize(Entity_Manager_Instance);
+   Components.Initialize(Component_Manager_Instance);
+   Systems.Initialize(System_Manager_Instance);
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Create an Entity
+   Entity_Instance := Entities.Create_Entity(Entity_Manager_Instance);
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Initialize Position Component
+   Position_Instance.X := 100.0;
+   Position_Instance.Y := 150.0;
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
+   -- Initialize Polygon Shape
+   Polygon_Shape_Instance.Points := (1 => (X => 0.0, Y => 0.0),
+                            2 => (X => 50.0, Y => 0.0),
+                            3 => (X => 25.0, Y => 50.0));
+   Polygon_Shape_Instance.Color := 16#FF00FF00#; -- Green color
 
-      Put_Line("Calling Mover");
-      Execute (Mover,2.0/60.0, Manager);
-      Execute (Collision,1.0/60.0, Manager);
-      
-end ECS_Tests;
+   -- Assign Shape to Shape Component
+   Shape_Instance.Shape := Polygon_Shape_Instance'Access;
 
-  
+   -- Add Components to Entity
+   Components.Add_Component(Component_Manager_Instance, Entity_Instance, Position_Instance'Access);
+   Components.Add_Component(Component_Manager_Instance, Entity_Instance, Shape_Instance'Access);
+
+   -- Initialize Render System
+   Render_System.Initialize(Render_System_Instance, Window_Instance, Screen_Width, Screen_Height);
+
+   -- Register Render System
+   Systems.Register_System(System_Manager_Instance, Render_System_Instance'Access);
+
+   -- Invoke the Render System (Assuming a delta time of 0.016 for ~60 FPS)
+   Systems.Update_System(System_Manager_Instance, 0.016);
+
+   -- Output a message indicating the test has completed
+   Put_Line("ECS test completed successfully.");
+
+exception
+   when others =>
+      Put_Line("An error occurred during the ECS test.");
+end ECS_Test;
