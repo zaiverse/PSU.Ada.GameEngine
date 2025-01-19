@@ -4,41 +4,8 @@ with Win32; use Win32;
 with ECS.Color; use ECS.Color;
 package Renderer is
 
-   --  D : constant := 1.0 / 256.0;
-   --  type intensity is delta D range 0.0 .. 1.0 with size => 8;
-   --  function Max return intensity
-   --  is (1.0 - D);
-
-   -- Note that Max_Lines and Max_Length needuse to be static
-   --  type Color_Data is
-   --    array (positive range <>, positive range <>) of intensity;
-
-   --  type Image
-   --    (width  : natural := 0;
-   --     height : natural := 0)
-   --  is record
-   --     r : Color_Data (1 .. width, 1 .. height);
-   --     g : Color_Data (1 .. width, 1 .. height);
-   --     b : Color_Data (1 .. width, 1 .. height);
-   --     a : Color_Data (1 .. width, 1 .. height);
-   --  end record;
-
    type bool is new boolean;
    for bool'size use 8;
-   --  type color is record
-   --     r : intensity;
-   --     g : intensity;
-   --     b : intensity;
-   --     a : intensity;
-   --  end record;
-   --  for color use
-   --    record
-   --      r at 0 range 0 .. 7;
-   --      g at 1 range 0 .. 7;
-   --      b at 2 range 0 .. 7;
-   --      a at 3 range 0 .. 7;
-   --    end record;
-   --  for color'Size use Interfaces.C.unsigned_long'size;
 
    procedure Clear_Screen
       (img : in out Byte_Array; c : color; Width : Natural; Height : Natural);

@@ -52,4 +52,4 @@ package ECS.System is
                       Manager : access Entity_Manager_T'Class );
 
 
-end ECS.System;
+end ECS.System; 

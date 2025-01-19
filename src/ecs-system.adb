@@ -38,7 +38,6 @@ package body ECS.System is
                Velocity_Scaled : ECS.Vec2.Vec2 := New_Vec2(X_In => T.Velocity.X, Y_In => T.Velocity.Y);
                begin
                   Scale(Velocity_Scaled, Float(Dt));
-                  --Put_Line ("Moving " & Entity.all.Id & " from: " & T.Position.X'Image & ", " & T.Position.Y'Image & ", " & T.Rotation'Image);
                   -- Update the entity position
                   Add(T.Position,Velocity_Scaled);
                   -- Sync bounding box
@@ -46,7 +45,6 @@ package body ECS.System is
                   B.Right := B.Right + Velocity_Scaled.X;
                   B.Top := B.Top + Velocity_Scaled.Y;
                   B.Bottom := B.Bottom + Velocity_Scaled.Y;
-                  --Put_Line ("Moved " & Entity.all.Id & " to: " & T.Position.X'Image & ", " & T.Position.Y'Image & ", " & T.Rotation'Image);
                end;
             end;
       end loop;   
