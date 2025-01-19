@@ -13,11 +13,15 @@ package ECS.Event is
       KeyCode      : Byte := 0;
       MouseX       : Integer := 0;
       MouseY       : Integer := 0;
+      W_Width      : Integer := 0;
+      W_Height     : Integer := 0;
       Additional   : Byte_Array(1 .. 5) := (others => 0);
    end record;
 
    -- Event types
-   type EventType_T is (NoEvent, KeyDown, KeyUp, L_MouseDown, L_MouseUp, MouseMove);
+   type EventType_T is (NoEvent, KeyDown, KeyUp, 
+                        L_MouseDown, L_MouseUp, MouseMove,
+                        W_Size);
 
    -- Define the event structure
    type Event_T is record

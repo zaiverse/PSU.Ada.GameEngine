@@ -15,7 +15,10 @@ package ECS.System is
 
    type System_Access is access all System_T'Class;
 
-   type Mover_T is new System_T with null record;
+   type Mover_T is new System_T with record
+      Width : Natural;
+      Height : Natural;
+   end record;
 
    procedure Execute ( Self : in out Mover_T;
                        Dt   : Duration; 
@@ -29,6 +32,7 @@ package ECS.System is
 
    type Render_T is new System_T with record
       Width : Natural;
+      Height : Natural;
       Buffer : Byte_Array_Access;
    end record;
 

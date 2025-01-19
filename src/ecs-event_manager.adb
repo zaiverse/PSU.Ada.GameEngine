@@ -34,6 +34,8 @@ package body ECS.Event_Manager is
             KeyCode     => 0,
             MouseX      => 0,
             MouseY      => 0,
+            W_Width     => 0, 
+            W_Height    => 0,
             Additional  => (others => 0)
          )
       );

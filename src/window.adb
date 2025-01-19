@@ -16,6 +16,18 @@ package body Window is
    -- Declare the event manager
    Manager : aliased ECS.Event_Manager.Platform_Event_Handler;
 
+   -- Return the lower 16 bits of LPARAM
+   function LOWORD(value : LPARAM) return WORD is
+      type Temp_Modular is mod 2 ** Standard'Address_Size;
+   begin
+      return WORD(Temp_Modular(value) and 16#FFFF#);
+   end LOWORD;
+   -- Return the upper 16 bits of LPARAM
+   function HIWORD(value : LPARAM) return WORD is 
+   begin
+      return WORD(value / 2 ** 16);
+   end HIWORD;
+
    -- EDITED 11/26/24 to add WM_KEYDOWN and WM_LBUTTONDOWN
    function Wnd_Proc (H_Wnd   : HWND; 
                      Msg     : IC.unsigned; 
@@ -28,17 +40,23 @@ package body Window is
 
          when WM_PAINT =>
             null;
+         
+         when WM_SIZE =>
+            Window.Current_Width := IC.int(LOWORD(L_Param));
+            Window.Current_Height := IC.int(HIWORD(L_Param));
 
          when WM_KEYDOWN =>
          declare
             KeyCode : ECS.Event.Byte := ECS.Event.Byte(W_Param);
             Event   : ECS.Event.Event_T :=
             (Source    => 0,
-               EventType => ECS.Event.KeyDown,
-               Data      => (KeyCode    => KeyCode,
-                           MouseX     => 0,
-                           MouseY     => 0,
-                           Additional => (others => 0)));
+             EventType => ECS.Event.KeyDown,
+             Data      => (KeyCode   => KeyCode,
+                           MouseX      => 0,
+                           MouseY      => 0,
+                           W_Width     => 0, 
+                           W_Height    => 0,
+                           Additional  => (others => 0)));
          begin
             Emit_Event(Manager, Event);
          end;
@@ -52,6 +70,8 @@ package body Window is
                Data      => (KeyCode    => KeyCode,
                            MouseX     => 0,
                            MouseY     => 0,
+                           W_Width     => 0, 
+                           W_Height    => 0,
                            Additional => (others => 0)));
          begin
             Emit_Event(Manager, Event);
@@ -68,6 +88,8 @@ package body Window is
                Data      => (KeyCode    => 0,
                              MouseX     => MouseX,
                              MouseY     => MouseY,
+                             W_Width     => 0, 
+                             W_Height    => 0,
                              Additional => (others => 0)));
          begin
             Emit_Event(Manager, MouseEvent);
@@ -84,6 +106,8 @@ package body Window is
                Data      => (KeyCode    => 0,
                              MouseX     => MouseX,
                              MouseY     => MouseY,
+                             W_Width     => 0, 
+                             W_Height    => 0,
                              Additional => (others => 0)));
          begin
             Emit_Event(Manager, MouseEvent);
@@ -103,6 +127,8 @@ package body Window is
                    Data      => (KeyCode    => 0,
                              MouseX     => MouseX,
                              MouseY     => MouseY,
+                             W_Width     => 0, 
+                             W_Height    => 0,
                              Additional => (others => 0)));
                begin
                   Emit_Event(Manager, MouseEvent);
@@ -120,7 +146,7 @@ package body Window is
    function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access is
       WC       : aliased WNDCLASS;
       Res_Atom : ATOM;
-      Window   : Window_Access := new Window_T;
+      W_Instance   : Window_Access := new Window_T;
    begin
       -- Initialize the WNDCLASS struct
       WC.Lp_fn_Wnd_Proc    := Wnd_Proc'Access;
@@ -135,7 +161,7 @@ package body Window is
       end if;
 
       -- Create the window
-      Window.Handle := Create_Window(
+      W_Instance.Handle := Create_Window(
          Dw_Ex_Style    => 0,
          Lp_Class_Name  => WC.Lpsz_Class_Name,
          Lp_Window_Name => TO_LPCSTR(ICS.New_String(To_String(Title))),
@@ -152,33 +178,33 @@ package body Window is
 
 
       -- Window properties
-      Window.Width := Width;
-      Window.Height := Height;
-      Window.Title := Title;
+      W_Instance.Width := Width;
+      W_Instance.Height := Height;
+      W_Instance.Title := Title;
      
       -- Show the window
       declare
          SW_Result : Boolean;
          UW_Result : Boolean;
       begin   
-         SW_Result := Show_Window(Window.Handle, SW_SHOW);
-         UW_Result := Update_Window(Window.Handle);
+         SW_Result := Show_Window(W_Instance.Handle, SW_SHOW);
+         UW_Result := Update_Window(W_Instance.Handle);
       end;
-      return Window;
+      return W_Instance;
 
    end New_Window;
 
 
 
-   procedure Draw_Buffer(Window : in out Window_T; Buffer : System.Address) is
+   procedure Draw_Buffer(W_Instance : in out Window_T; Buffer : System.Address) is
       Bmi_Reset : Byte_Array (0 .. BITMAPINFO'Size / 8 - 1) := (others => 0);
       Bmi : aliased BITMAPINFO with Address => Bmi_Reset'Address;
       Result : Interfaces.C.int;
-      Handle_DC : HDC := GetDC(Window.Handle);
+      Handle_DC : HDC := GetDC(W_Instance.Handle);
    begin
       Bmi.bmiHeader.biSize            := BITMAPINFOHEADER'Size / 8;
-      Bmi.bmiHeader.biWidth           := Window.Width;   
-      Bmi.bmiHeader.biHeight          := -Window.Height;
+      Bmi.bmiHeader.biWidth           := W_Instance.Width;   
+      Bmi.bmiHeader.biHeight          := -W_Instance.Height;
       Bmi.bmiHeader.biPlanes          := 1;
       Bmi.bmiHeader.biBitCount        := 32;
       Bmi.bmiHeader.biCompression     := BI_RGB;
@@ -192,12 +218,12 @@ package body Window is
          H_Dc           => Handle_DC,
          X_Dest         => 0,
          Y_Dest         => 0,
-         Dest_Width     => Window.Width,
-         Dest_Height    => Window.Height,
+         Dest_Width     => Window.Current_Width,
+         Dest_Height    => Window.Current_Height,
          X_Src          => 0,
          Y_Src          => 0,
-         Src_Width      => Window.Width,
-         Src_Height     => Window.Height,
+         Src_Width      => W_Instance.Width, 
+         Src_Height     => W_Instance.Height,
          Bits           => Buffer,
          Bitmap_Info    => Bmi'Unchecked_Access,
          Usage          => DIB_RGB_COLORS,
@@ -207,7 +233,7 @@ package body Window is
       -- Release the HDC to avoid memory leak
       if Handle_DC /= Null_Address then
          declare
-            Result_Release : Boolean := ReleaseDC(Window.Handle, Handle_DC);
+            Result_Release : Boolean := ReleaseDC(W_Instance.Handle, Handle_DC);
          begin
             if not Result_Release then
                Put_Line("Failed to release HDC.");
@@ -215,9 +241,9 @@ package body Window is
          end;
       end if;
 
-      -- Check for drawing failure
+      -- Check for drawing failure, for debug only, remove or comment out for production or handle it more gracefully
       if Result = 0 then
-         Put_Line("StretchDIBits failed.");
+         Put_Line("StretchDIBits failed.");  
       end if;
    end Draw_Buffer;
 

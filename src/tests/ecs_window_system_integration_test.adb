@@ -14,11 +14,15 @@ with ECS.Vec2; use ECS.Vec2;
 with ECS.System; use ECS.System;
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
+with Interfaces.C;
 
 procedure ECS_Window_System_Integration_Test is
+package IC renames Interfaces.C; use IC;
+Width : Integer := 800;
+Height : Integer := 600;
 Title : Unbounded_String := To_Unbounded_String("Game Window");
 GameWindow : Window_Access;
-Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. 800 * 600 * 4);
+Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
 SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
 Start_Time, Stop_Time : Time;
 Elapsed_Time          : Time_Span;
@@ -31,9 +35,9 @@ Player : Entity_Access := Manager.all.AddEntity("Playr");
 E1 : Entity_Access := Manager.all.AddEntity("E0001");
 
 -- Systems
-Mover : Mover_T;
+Mover : Mover_T := (Width, Height);
 Collision : Collision_T;
-Render : Render_T := (800,Buffer);
+Render : Render_T := (Width, Height, Buffer);
 UserInput : User_Input_T := (Player, Event_Mgr, False, True);
 -- Player components
 Transform_P : Component_Access := new Transform_T'(Position => (X => 400.0, Y => 300.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
@@ -45,7 +49,7 @@ AABB_P      : Component_Access := new AABB_T'(
    Right => T_P.Position.X + 5.0, 
    Top => T_P.Position.Y);
 Collision_Params_P : Component_Access := new Collision_Params_T'(
-   Collision_Enabled => False,
+   Collision_Enabled => True,
    Collision_Occurred => False,
    Destroy_On_Collision => True,
    Left_Bound => False,
@@ -104,7 +108,7 @@ begin
    Start_Time := Clock;
    Stop_Time := Clock;
 
-   GameWindow := New_Window(800,600,Title);
+   GameWindow := New_Window(IC.int(Width),IC.int(Height),Title);
    Put_Line ("Start Engine");
  
 
@@ -120,16 +124,15 @@ begin
          Start_Time := Stop_Time;
          Lp_Result := Dispatch_Message (Message);
          Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
-
          -- Process emitted events here - for debug purposes
-         --Process_Events(Event_Mgr.all);
          Manager.all.update;
-         Clear_Screen(Buffer.all, ECS.Color.Black, 800, 600);
+         Clear_Screen(Buffer.all, ECS.Color.Black, Width, Height);
          UserInput.Execute(To_Duration(Elapsed_Time), Manager);
-         Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
+         Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
          GameWindow.Draw_Buffer(Buffer.all'Address);
+         delay 0.016; -- temporary measure to control frame rate
       end loop;
    end;
 end ECS_Window_System_Integration_Test;

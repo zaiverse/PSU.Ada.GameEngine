@@ -42,6 +42,12 @@ package Win32 is
    MK_XBUTTON1 : constant := 32;        -- X1 mouse button (extra button)
    MK_XBUTTON2 : constant := 64;        -- X2 mouse button (extra button)
 
+   -- Windowing events -- 
+   WM_SIZE : constant := 16#0005#;           -- Sent after a window's size has changed
+   WM_SIZING : constant := 16#0214#;         -- Sent while a window is being resized
+   WM_GETMINMAXINFO : constant := 16#0024#;  -- Sent to determine minimum and maximum window sizes
+   WM_WINDOWPOSCHANGED : constant := 16#0047#; -- Sent after a window's position or size changes
+
    type LPCSTR is access constant IC.char;
    type LPSTR is access all IC.char;
 
@@ -317,9 +323,10 @@ package Win32 is
    with Import => True, Convention => C, External_Name => "GetDC";
 
    function ReleaseDC
-  (H_Wnd : HWND;
-   H_Dc  : HDC) return Boolean
+      (
+         H_Wnd : HWND;
+         H_Dc  : HDC
+      ) return Boolean
    with Import => True, Convention => C, External_Name => "ReleaseDC";
-
 
 end Win32;
