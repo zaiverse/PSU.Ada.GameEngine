@@ -62,7 +62,6 @@ package body renderer is
       if abs dx < abs dy then
          swap (x0, y0);
          swap (x1, y1);
-         Put_Line(x1'Image & " : " & y1'Image);
          steep := true;
       end if;
       if x0 > x1 then
