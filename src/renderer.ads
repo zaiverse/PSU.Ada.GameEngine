@@ -11,16 +11,17 @@ package Renderer is
       (img : in out Byte_Array; c : color; Width : Natural; Height : Natural);
 
    procedure set_pixel_color
-     (img : in out Byte_Array; x : natural; y : natural; c : color; Width : Natural);
+     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Width : Natural; Height : Natural);
 
    procedure line
-     (x0  : in out natural;
-      y0  : in out natural;
-      x1  : in out natural;
-      y1  : in out natural;
+     (x0  : in out Integer;
+      y0  : in out Integer;
+      x1  : in out Integer;
+      y1  : in out Integer;
       c   : color;
       img : in out Byte_Array;
-      Width : Natural);
+      Width : Natural;
+      Height : Natural);
 
    procedure Draw_Regular_Polygon
      (img      : in out Byte_Array;
@@ -29,7 +30,8 @@ package Renderer is
       Center_X : Float;
       Center_Y : Float;
       c        : Color;
-      Width    : Natural);
+      Width    : Natural;
+      Height   : Natural);
 
    --procedure Draw_Image_To_Window (img : Image);
 

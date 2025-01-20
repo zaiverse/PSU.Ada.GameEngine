@@ -38,8 +38,21 @@ package body ECS.System is
                Velocity_Scaled : ECS.Vec2.Vec2 := New_Vec2(X_In => T.Velocity.X, Y_In => T.Velocity.Y);
                begin
                   Scale(Velocity_Scaled, Float(Dt));
-                  -- Update the entity position
-                  Add(T.Position,Velocity_Scaled);
+                  -- Update the entity position while maintaining the position within screen bounds
+                  T.Position.X := T.Position.X + Velocity_Scaled.X;
+                  if T.Position.X >= Float(Self.Width) then
+                     T.Position.X := T.Position.X - Float(Self.Width);
+                  elsif T.Position.X < 0.0 then 
+                     T.Position.X := T.Position.X + Float(Self.Width);
+                  end if;
+
+                  T.Position.Y := T.Position.Y + Velocity_Scaled.Y;
+                  if T.Position.Y >= Float(Self.Height) then
+                     T.Position.Y := T.Position.Y - Float(Self.Height);
+                  elsif T.Position.Y < 0.0 then
+                     T.Position.Y := T.Position.Y + Float(Self.Height);
+                  end if;
+
                   -- Sync bounding box
                   B.Left := B.Left + Velocity_Scaled.X;
                   B.Right := B.Right + Velocity_Scaled.X;
@@ -128,7 +141,7 @@ package body ECS.System is
                T renames Transform_T(Trans.all);
                S renames Shape_T(Shape.all);
             begin
-               Draw_Regular_Polygon(Self.Buffer.all, S.Sides, S.Radius, T.Position.X,T.Position.Y, S.C, Self.Width);
+               Draw_Regular_Polygon(Self.Buffer.all, S.Sides, S.Radius, T.Position.X,T.Position.Y, S.C, Self.Width, Self.Height);
             end;
          end;
       end loop; 

@@ -9,8 +9,8 @@ package body renderer is
    package IC renames interfaces.C;
 
    type Point is record
-      X : Natural;
-      Y : Natural;
+      X : Integer;
+      Y : Integer;
    end record;
 
    type Polygon is array (Natural range <>) of Point;
@@ -23,8 +23,8 @@ package body renderer is
    end generic_swap;
    
    procedure set_pixel_color
-     (img : in out Byte_Array; x : natural; y : natural; c : color; Width : Natural) is
-     Index : Natural := (y * Width + x ) * 4;
+     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Width : Natural; Height : Natural) is
+     Index : Natural := ((y mod Height) * Width + (x mod Width) ) * 4;
    begin
       Img(Index)     := Byte(C.B);
       Img(Index + 1) := Byte(C.G);
@@ -36,30 +36,33 @@ package body renderer is
    begin
       for Y in 0 .. Height - 1 loop
          for X in 0 .. Width - 1 loop
-            set_pixel_color(img, X, Y, c, Width);
+            set_pixel_color(img, X, Y, c, Width, Height);
          end loop;
       end loop;
    end Clear_Screen;
 
    procedure line
-     (x0  : in out natural;
-      y0  : in out natural;
-      x1  : in out natural;
-      y1  : in out natural;
+     (x0  : in out Integer;
+      y0  : in out Integer;
+      x1  : in out Integer;
+      y1  : in out Integer;
       c   : color;
       img : in out Byte_Array;
-      Width : Natural)
+      Width : Natural;
+      Height : Natural)
 
    is
-      procedure swap is new generic_swap (T => natural);
+      procedure swap is new generic_swap (T => Integer);
       steep              : Boolean := False;
       dx                 : Integer := x0 - x1;
       dy                 : Integer := y0 - y1;
       derror2, error2, y : integer := 0;
+
    begin
       if abs dx < abs dy then
          swap (x0, y0);
          swap (x1, y1);
+         Put_Line(x1'Image & " : " & y1'Image);
          steep := true;
       end if;
       if x0 > x1 then
@@ -74,9 +77,9 @@ package body renderer is
 
       for x in x0 .. x1 loop
          if steep then
-            set_pixel_color (img, y, x, c, Width);
+            set_pixel_color (img, y, x, c, Width, Height);
          else
-            set_pixel_color (img, x, y, c, Width);
+            set_pixel_color (img, x, y, c, Width, Height);
          end if;
          error2 := error2 + derror2;
          if error2 > dx then
@@ -88,35 +91,19 @@ package body renderer is
    end line;
 
    function Generate_Polygon_Vertices
-     (Sides : Positive; Radius : Natural; Center_X, Center_Y : Float)
+     (Sides : Positive; Radius : Natural; Center_X, Center_Y : Float; Width : Natural; Height : Natural)
       return Polygon
    is
       Vertices      : Polygon (0 .. Sides - 1);
-      Current_Angle : Natural;
    begin
       for I in Vertices'Range loop
          declare
-            Angle : constant Float :=
-              2.0 * Ada.Numerics.Pi / Float (Sides) * Float (I);
-
+            Angle : constant Float := 2.0 * Ada.Numerics.Pi / Float (Sides) * Float (I);
+            X_Pos : Float := Float(Center_X) + Float(Radius) * Ada.Numerics.Elementary_Functions.Cos(Angle);
+            Y_Pos : Float := Float(Center_Y) + Float(Radius) * Ada.Numerics.Elementary_Functions.Sin(Angle); 
          begin
-
-            Current_Angle :=
-              Natural
-                (Float (Center_X)
-                 + Float (Radius)
-                   * Ada.Numerics.Elementary_Functions.Cos (Angle));
-
-            Vertices (I).X :=
-              Natural
-                (Float (Center_X)
-                 + Float (Radius)
-                   * Ada.Numerics.Elementary_Functions.Cos (Angle));
-            Vertices (I).Y :=
-              Natural
-                (Float (Center_Y)
-                 + Float (Radius)
-                   * Ada.Numerics.Elementary_Functions.Sin (Angle));
+            Vertices(I).X := Integer(X_Pos);
+            Vertices(I).Y := Integer(Y_Pos);
          end;
       end loop;
       return Vertices;
@@ -129,10 +116,11 @@ package body renderer is
       Center_X : float;
       Center_Y : float;
       c        : Color;
-      Width    : Natural)
+      Width    : Natural;
+      Height   : Natural)
    is
       Vertices : Polygon :=
-        Generate_Polygon_Vertices (Sides, Radius, Center_X, Center_Y);
+        Generate_Polygon_Vertices (Sides, Radius, Center_X, Center_Y, Width, Height);
    begin
       for I in Vertices'Range loop
          declare
@@ -140,11 +128,13 @@ package body renderer is
             Vertex     : Point := Vertices (I);
             New_Vertex : Point := Vertices (Next_I);
          begin
-
-            line (Vertex.X, Vertex.Y, New_Vertex.X, New_Vertex.Y, c, img, Width);
+            line (Vertex.X, Vertex.Y, New_Vertex.X, New_Vertex.Y, c, img, Width, Height);
          end;
       end loop;
    end Draw_Regular_Polygon;
+
+
+
 
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;
