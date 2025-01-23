@@ -131,9 +131,82 @@ package body renderer is
          end;
       end loop;
    end Draw_Regular_Polygon;
+   -- Helper for Draw_Filled_Triangle
+   procedure DrawHorizontalLine(img : in out Byte_Array; X1,X2: in out Float; Y : Integer; C : Color; Width,Height : Natural) is
+      procedure swap is new generic_swap(T => Float);
+   begin
+      -- make sure X1 is less than X2
+      if X1 > X2 then 
+         swap(X1, X2);
+      end if;
+      for X in Integer(Float'Floor(X1)) .. Integer(Float'Floor(X2)) loop
+         set_pixel_color (img, X, Integer(Y), C, Width, Height);
+      end loop; 
+      
+   end DrawHorizontalLine;
+   -- Helper for Draw_Filled Triangle
+   procedure Fill_Top_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+   begin
+      -- Calculate slopes for the left and right edges
+      LeftSlope : Float := (V3.X - V1.X) / (V3.Y - V1.Y);
+      RightSlope : Float := (V3.X - V2.X) / (V3.Y - V2.Y);
+      -- Set x-coord for the edges
+      CurXLeft : Float := V3.X;
+      CurXRight : Float := V3.X;
+      -- Iterate through the scanlines 
+      for Y in reverse Integer(V3.Y) .. Integer(V1.Y) loop
+         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Width,Height);
+         CurXLeft := CurXLeft - LeftSlope;
+         CurXRight := CurXRight - RightSlope;
+      end loop;
+   end Fill_Top_Triangle;
+   -- Helper for Draw_Filled_Triangle
+   procedure Fill_Bottom_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+   begin
+      -- Calculate slopes for the left and right edges
+      LeftSlope : Float := (V2.X - V1.X) / (V2.Y - V1.Y);
+      RightSlope : Float := (V3.X - V1.X) / (V3.Y - V1.Y);
+      -- Set x-coord for the edges
+      CurXLeft : Float := V1.X;
+      CurXRight : Float := V1.X;
+      -- Iterate through the scanlines
+      for Y in Integer(V1.Y) .. Integer(V2.Y) loop
+         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Width,Height);
+         CurXLeft := CurXLeft + LeftSlope;
+         CurXRight := CurXRight + RightSlope;
+      end loop;
+   end Fill_Bottom_Triangle;
 
-
-
+   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+      procedure swap is new generic_swap (T => Float);
+   begin
+      -- Sort vertices by Y
+      if V1.Y > V2.Y then 
+         swap(V1.X, V2.X);
+         swap(V1.Y, V2.Y);
+      end if;
+      if V2.Y > V3.Y then
+         swap(V2.X, V3.X);
+         swap(V2.Y, V3.Y);
+      end if;
+      -- Recheck the first pair to ensure order
+      if V1.Y > V2.Y then
+         swap(V1.X, V2.X);
+         swap(V1.Y, V2.Y);
+      end if;
+      -- Split triangle into top-flat and bottom-flat
+      if V2.Y = V3.Y then
+         Fill_Bottom_Triangle(img, V1, V2, V3, C, Width,Height);
+      elsif V1.Y = V2.Y then
+         Fill_Top_Triangle(img, V1, V2, V3, C, Width,Height);
+      else
+         -- Split Vertex
+         SplitX : Float := V1.X + (V2.Y - V1.Y) / (V3.Y - V1.Y) * (V3.X - V1.X);
+         SplitVertex : Vec2 := (SplitX, V2.Y);
+         Fill_Bottom_Triangle(img, V1, V2, SplitVertex, C, Width, Height);
+         Fill_Top_Triangle(img, V2, SplitVertex, V3, C, Width, Height);
+      end if;
+   end Draw_Filled_Triangle;
 
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;

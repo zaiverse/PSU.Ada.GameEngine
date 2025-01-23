@@ -12,7 +12,7 @@ package body Window is
    package IC renames Interfaces.C; use IC;
    package ICS renames IC.Strings;
 
-
+   W_Instance   : Window_Access;
    -- Declare the event manager
    Manager : aliased ECS.Event_Manager.Platform_Event_Handler;
 
@@ -42,8 +42,8 @@ package body Window is
             null;
          
          when WM_SIZE =>
-            Window.Current_Width := IC.int(LOWORD(L_Param));
-            Window.Current_Height := IC.int(HIWORD(L_Param));
+            W_Instance.Current_Width := IC.int(LOWORD(L_Param));
+            W_Instance.Current_Height := IC.int(HIWORD(L_Param));
 
          when WM_KEYDOWN =>
          declare
@@ -146,8 +146,9 @@ package body Window is
    function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access is
       WC       : aliased WNDCLASS;
       Res_Atom : ATOM;
-      W_Instance   : Window_Access := new Window_T;
+      
    begin
+      W_Instance := new Window_T;
       -- Initialize the WNDCLASS struct
       WC.Lp_fn_Wnd_Proc    := Wnd_Proc'Access;
       WC.H_Instance        := Get_H_Instance;
@@ -196,7 +197,7 @@ package body Window is
 
 
 
-   procedure Draw_Buffer(W_Instance : in out Window_T; Buffer : System.Address) is
+   procedure Draw_Buffer(Buffer : System.Address) is
       Bmi_Reset : Byte_Array (0 .. BITMAPINFO'Size / 8 - 1) := (others => 0);
       Bmi : aliased BITMAPINFO with Address => Bmi_Reset'Address;
       Result : Interfaces.C.int;
@@ -218,8 +219,8 @@ package body Window is
          H_Dc           => Handle_DC,
          X_Dest         => 0,
          Y_Dest         => 0,
-         Dest_Width     => Window.Current_Width,
-         Dest_Height    => Window.Current_Height,
+         Dest_Width     => W_Instance.Current_Width,
+         Dest_Height    => W_Instance.Current_Height,
          X_Src          => 0,
          Y_Src          => 0,
          Src_Width      => W_Instance.Width, 

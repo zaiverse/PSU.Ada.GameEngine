@@ -12,6 +12,11 @@ with ECS.Event; use ECS.Event;
 with ECS.Event_Manager; use ECS.Event_Manager;
 with ECS.Vec2; use ECS.Vec2;
 with ECS.System; use ECS.System;
+with ECS.System.Movement; use ECS.System.Movement;
+with ECS.System.Collision; use ECS.System.Collision;
+with ECS.System.Render; use ECS.System.Render;
+with ECS.System.User_Input; use ECS.System.User_Input;
+
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
 with Interfaces.C;
@@ -117,6 +122,9 @@ begin
       Message        : MSG_Access := new MSG;
       Has_Msg        : Boolean := True;
       Lp_Result      : LRESULT;
+      V1 : Vec2 := (400.0,200.0);
+      V2 : Vec2 := (350.0, 300.0);
+      V3 : Vec2 := (450.0, 300.0);
    begin
       while Has_Msg loop
          Stop_Time := Clock;
@@ -131,7 +139,8 @@ begin
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
          Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
-         GameWindow.Draw_Buffer(Buffer.all'Address);
+         Draw_Filled_Triangle (Buffer.all, V1, V2, V3, ECS.Color.Green, Width, Height);
+         Draw_Buffer(Buffer.all'Address);
          delay 0.016; -- temporary measure to control frame rate
       end loop;
    end;

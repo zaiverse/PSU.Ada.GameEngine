@@ -2,6 +2,7 @@ with Interfaces;
 with Interfaces.C;
 with Win32; use Win32;
 with ECS.Color; use ECS.Color;
+with ECS.Vec2; use ECS.Vec2;
 package Renderer is
 
    type bool is new boolean;
@@ -34,6 +35,7 @@ package Renderer is
       Height   : Natural);
 
    --procedure Draw_Image_To_Window (img : Image);
+   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural);
 
    generic
       type t is private;
