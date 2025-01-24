@@ -23,8 +23,8 @@ package body renderer is
    end generic_swap;
    
    procedure set_pixel_color
-     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Width : Natural; Height : Natural) is
-     Index : Natural := ((y mod Height) * Width + (x mod Width) ) * 4;
+     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Screen_Width : Natural; Screen_Height : Natural) is
+     Index : Natural := ((y mod Screen_Height) * Screen_Width + (x mod Screen_Width) ) * 4;
    begin
       Img(Index)     := Byte(C.B);
       Img(Index + 1) := Byte(C.G);
@@ -32,11 +32,11 @@ package body renderer is
       Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
-   procedure Clear_Screen ( img : in out Byte_Array; c : color; Width : Natural; Height : Natural) is
+   procedure Clear_Screen ( img : in out Byte_Array; c : color; Screen_Width : Natural; Screen_Height : Natural) is
    begin
-      for Y in 0 .. Height - 1 loop
-         for X in 0 .. Width - 1 loop
-            set_pixel_color(img, X, Y, c, Width, Height);
+      for Y in 0 .. Screen_Height - 1 loop
+         for X in 0 .. Screen_Width - 1 loop
+            set_pixel_color(img, X, Y, c, Screen_Width, Screen_Height);
          end loop;
       end loop;
    end Clear_Screen;
@@ -48,8 +48,8 @@ package body renderer is
       y1  : in out Integer;
       c   : color;
       img : in out Byte_Array;
-      Width : Natural;
-      Height : Natural)
+      Screen_Width : Natural;
+      Screen_Height : Natural)
 
    is
       procedure swap is new generic_swap (T => Integer);
@@ -76,9 +76,9 @@ package body renderer is
 
       for x in x0 .. x1 loop
          if steep then
-            set_pixel_color (img, y, x, c, Width, Height);
+            set_pixel_color (img, y, x, c, Screen_Width, Screen_Height);
          else
-            set_pixel_color (img, x, y, c, Width, Height);
+            set_pixel_color (img, x, y, c, Screen_Width, Screen_Height);
          end if;
          error2 := error2 + derror2;
          if error2 > dx then
@@ -90,7 +90,7 @@ package body renderer is
    end line;
 
    function Generate_Polygon_Vertices
-     (Sides : Positive; Radius : Natural; Center_X, Center_Y : Float; Width : Natural; Height : Natural)
+     (Sides : Positive; Radius : Natural; Center_X, Center_Y : Float; Screen_Width : Natural; Screen_Height : Natural)
       return Polygon
    is
       Vertices      : Polygon (0 .. Sides - 1);
@@ -115,11 +115,11 @@ package body renderer is
       Center_X : float;
       Center_Y : float;
       c        : Color;
-      Width    : Natural;
-      Height   : Natural)
+      Screen_Width    : Natural;
+      Screen_Height   : Natural)
    is
       Vertices : Polygon :=
-        Generate_Polygon_Vertices (Sides, Radius, Center_X, Center_Y, Width, Height);
+        Generate_Polygon_Vertices (Sides, Radius, Center_X, Center_Y, Screen_Width, Screen_Height);
    begin
       for I in Vertices'Range loop
          declare
@@ -127,12 +127,12 @@ package body renderer is
             Vertex     : Point := Vertices (I);
             New_Vertex : Point := Vertices (Next_I);
          begin
-            line (Vertex.X, Vertex.Y, New_Vertex.X, New_Vertex.Y, c, img, Width, Height);
+            line (Vertex.X, Vertex.Y, New_Vertex.X, New_Vertex.Y, c, img, Screen_Width, Screen_Height);
          end;
       end loop;
    end Draw_Regular_Polygon;
    -- Helper for Draw_Filled_Triangle
-   procedure DrawHorizontalLine(img : in out Byte_Array; X1,X2: in out Float; Y : Integer; C : Color; Width,Height : Natural) is
+   procedure DrawHorizontalLine(img : in out Byte_Array; X1,X2: in out Float; Y : Integer; C : Color; Screen_Width,Screen_Height : Natural) is
       procedure swap is new generic_swap(T => Float);
    begin
       -- make sure X1 is less than X2
@@ -140,12 +140,12 @@ package body renderer is
          swap(X1, X2);
       end if;
       for X in Integer(Float'Floor(X1)) .. Integer(Float'Floor(X2)) loop
-         set_pixel_color (img, X, Integer(Y), C, Width, Height);
+         set_pixel_color (img, X, Integer(Y), C, Screen_Width, Screen_Height);
       end loop; 
       
    end DrawHorizontalLine;
    -- Helper for Draw_Filled Triangle
-   procedure Fill_Top_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+   procedure Fill_Top_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
    begin
       -- Calculate slopes for the left and right edges
       LeftSlope : Float := (V3.X - V1.X) / (V3.Y - V1.Y);
@@ -153,15 +153,17 @@ package body renderer is
       -- Set x-coord for the edges
       CurXLeft : Float := V3.X;
       CurXRight : Float := V3.X;
-      -- Iterate through the scanlines 
-      for Y in reverse Integer(V3.Y) .. Integer(V1.Y) loop
-         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Width,Height);
+      -- Iterate through the scanlines
+      Y : Integer := Integer(Float'Floor(V3.Y));
+      while Y >= Integer(Float'Floor(V1.Y)) loop
+         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Screen_Width,Screen_Height);
          CurXLeft := CurXLeft - LeftSlope;
          CurXRight := CurXRight - RightSlope;
+         Y := Y - 1;
       end loop;
    end Fill_Top_Triangle;
    -- Helper for Draw_Filled_Triangle
-   procedure Fill_Bottom_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+   procedure Fill_Bottom_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
    begin
       -- Calculate slopes for the left and right edges
       LeftSlope : Float := (V2.X - V1.X) / (V2.Y - V1.Y);
@@ -171,13 +173,13 @@ package body renderer is
       CurXRight : Float := V1.X;
       -- Iterate through the scanlines
       for Y in Integer(V1.Y) .. Integer(V2.Y) loop
-         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Width,Height);
+         DrawHorizontalLine(img, CurXLeft, CurXRight, Y, C, Screen_Width,Screen_Height);
          CurXLeft := CurXLeft + LeftSlope;
          CurXRight := CurXRight + RightSlope;
       end loop;
    end Fill_Bottom_Triangle;
-
-   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural) is
+   -- Scanline rasterization for filled triangle
+   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
       procedure swap is new generic_swap (T => Float);
    begin
       -- Sort vertices by Y
@@ -196,17 +198,30 @@ package body renderer is
       end if;
       -- Split triangle into top-flat and bottom-flat
       if V2.Y = V3.Y then
-         Fill_Bottom_Triangle(img, V1, V2, V3, C, Width,Height);
+         Fill_Bottom_Triangle(img, V1, V2, V3, C, Screen_Width,Screen_Height);
       elsif V1.Y = V2.Y then
-         Fill_Top_Triangle(img, V1, V2, V3, C, Width,Height);
+         Fill_Top_Triangle(img, V1, V2, V3, C, Screen_Width,Screen_Height);
       else
          -- Split Vertex
          SplitX : Float := V1.X + (V2.Y - V1.Y) / (V3.Y - V1.Y) * (V3.X - V1.X);
          SplitVertex : Vec2 := (SplitX, V2.Y);
-         Fill_Bottom_Triangle(img, V1, V2, SplitVertex, C, Width, Height);
-         Fill_Top_Triangle(img, V2, SplitVertex, V3, C, Width, Height);
+         Fill_Bottom_Triangle(img, V1, V2, SplitVertex, C, Screen_Width, Screen_Height);
+         Fill_Top_Triangle(img, V2, SplitVertex, V3, C, Screen_Width, Screen_Height);
       end if;
    end Draw_Filled_Triangle;
+
+   procedure Draw_Filled_Quad(img : in out Byte_Array; X,Y,Width,Height : Float; C : Color; Screen_Width, Screen_Height : Natural) is
+      V1, V2, V3, V4, V5, V6 : Vec2;
+   begin
+      V1 := (X,Y);
+      V2 := (X, Y + Height);
+      V3 := (X + Width, Y);
+      V4 := (X, Y + Height);
+      V5 := (X + Width, Y + Height);
+      V6 := (X + Width, Y);
+      Draw_Filled_Triangle(img, V1, V2, V3,C,Screen_Width,Screen_Height);
+      Draw_Filled_Triangle(img, V4, V5, V6,C,Screen_Width,Screen_Height);
+   end Draw_Filled_Quad;
 
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;

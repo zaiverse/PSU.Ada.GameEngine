@@ -122,9 +122,7 @@ begin
       Message        : MSG_Access := new MSG;
       Has_Msg        : Boolean := True;
       Lp_Result      : LRESULT;
-      V1 : Vec2 := (400.0,200.0);
-      V2 : Vec2 := (350.0, 300.0);
-      V3 : Vec2 := (450.0, 300.0);
+
    begin
       while Has_Msg loop
          Stop_Time := Clock;
@@ -139,7 +137,8 @@ begin
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
          Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
-         Draw_Filled_Triangle (Buffer.all, V1, V2, V3, ECS.Color.Green, Width, Height);
+         -- For testing, quads will normally be a component of an entity and called by the rendering system
+         Draw_Filled_Quad(Buffer.all,50.0, 50.0, 50.0, 100.0, ECS.Color.Blue, Width, Height);
          Draw_Buffer(Buffer.all'Address);
          delay 0.016; -- temporary measure to control frame rate
       end loop;

@@ -9,10 +9,10 @@ package Renderer is
    for bool'size use 8;
 
    procedure Clear_Screen
-      (img : in out Byte_Array; c : color; Width : Natural; Height : Natural);
+      (img : in out Byte_Array; c : color; Screen_Width : Natural; Screen_Height : Natural);
 
    procedure set_pixel_color
-     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Width : Natural; Height : Natural);
+     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Screen_Width : Natural; Screen_Height : Natural);
 
    procedure line
      (x0  : in out Integer;
@@ -21,8 +21,8 @@ package Renderer is
       y1  : in out Integer;
       c   : color;
       img : in out Byte_Array;
-      Width : Natural;
-      Height : Natural);
+      Screen_Width : Natural;
+      Screen_Height : Natural);
 
    procedure Draw_Regular_Polygon
      (img      : in out Byte_Array;
@@ -31,11 +31,12 @@ package Renderer is
       Center_X : Float;
       Center_Y : Float;
       c        : Color;
-      Width    : Natural;
-      Height   : Natural);
+      Screen_Width    : Natural;
+      Screen_Height   : Natural);
 
    --procedure Draw_Image_To_Window (img : Image);
-   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Width, Height : Natural);
+   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural);
+   procedure Draw_Filled_Quad(img : in out Byte_Array; X,Y,Width,Height : Float; C : Color; Screen_Width, Screen_Height : Natural);
 
    generic
       type t is private;
