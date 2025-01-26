@@ -219,8 +219,10 @@ package body renderer is
       V4 := (X, Y + Height);
       V5 := (X + Width, Y + Height);
       V6 := (X + Width, Y);
-      Draw_Filled_Triangle(img, V1, V2, V3,C,Screen_Width,Screen_Height);
-      Draw_Filled_Triangle(img, V4, V5, V6,C,Screen_Width,Screen_Height);
+      -- Draw flat-top triangle
+      Draw_Filled_Triangle(img, V1, V2, V3, C, Screen_Width, Screen_Height);
+      -- Draw flat-bottom triangle
+      Draw_Filled_Triangle(img, V4, V5, V6, C, Screen_Width, Screen_Height);
    end Draw_Filled_Quad;
 
    --  procedure Draw_Image_To_Window (img : Image) is

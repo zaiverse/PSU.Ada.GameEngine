@@ -64,21 +64,17 @@ Collision_Params_P : Component_Access := new Collision_Params_T'(
 );
 C_P : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
 
-Shape_P : Component_Access := new Shape_T'(
-   Sides => 6,
-   Radius => 25,
-   C => (R=> 0, G => 255, B => 0, A => 255)
+Shape_P : Component_Access := new Quad_T'(
+   Width => 50.0,
+   Height => 50.0,
+   C => (R=> 255, G => 255, B => 0, A => 255)
 );
 
    -- E1 components
-Transform_E1 : Component_Access := new Transform_T'(Position => (X => 600.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
+Transform_E1 : Component_Access := new Transform_T'(Position => (X => 600.0, Y => 100.0), Velocity => (X => 300.0, Y => 150.0), Rotation => 0.0);
 T_E1 : Transform_T renames Transform_T(Transform_E1.all);
 Rigidbody_E1 : Component_Access := new Rigidbody_T'(Mass => 1.0);
-AABB_E1      : Component_Access := new AABB_T'(
-   Left => T_E1.Position.X, 
-   Bottom => T_E1.Position.Y + 5.0, 
-   Right => T_E1.Position.X + 5.0, 
-   Top => T_E1.Position.Y);
+AABB_E1      : Component_Access := new AABB_T;
 Collision_Params_E1 : Component_Access := new Collision_Params_T'(
    Collision_Enabled => True,
    Collision_Occurred => False,
@@ -90,9 +86,9 @@ Collision_Params_E1 : Component_Access := new Collision_Params_T'(
 );
 C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 
-Shape_E1 : Component_Access := new Shape_T'(
-   Sides => 4,
-   Radius => 25,
+Shape_E1 : Component_Access := new Quad_T'(
+   Width => 100.0,
+   Height => 100.0,
    C => (R => 255, G => 0, B => 0, A => 255)
 );
 
@@ -132,13 +128,11 @@ begin
          Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
          -- Process emitted events here - for debug purposes
          Manager.all.update;
-         Clear_Screen(Buffer.all, ECS.Color.Black, Width, Height);
+         Clear_Screen(Buffer.all, ECS.Color.Blue, Width, Height);
          UserInput.Execute(To_Duration(Elapsed_Time), Manager);
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
          Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
-         -- For testing, quads will normally be a component of an entity and called by the rendering system
-         Draw_Filled_Quad(Buffer.all,50.0, 50.0, 50.0, 100.0, ECS.Color.Blue, Width, Height);
          Draw_Buffer(Buffer.all'Address);
          delay 0.016; -- temporary measure to control frame rate
       end loop;
