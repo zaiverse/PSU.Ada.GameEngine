@@ -1,4 +1,6 @@
 with ECS.System; use ECS.System;
+with ECS.System.Movement; use ECS.System.Movement;
+with ECS.System.Collision; use ECS.System.Collision;
 with ECS.Entity; use ECS.Entity;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 with ECS.Component; use ECS.Component;

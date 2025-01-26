@@ -1,4 +1,4 @@
-package ECS.Color is
+package Graphics.Color is
    type Color_Int is mod 2 ** 8;
 
    type Color is record
@@ -14,4 +14,5 @@ package ECS.Color is
    Blue   : constant Color := (R => 0,   G => 0,   B => 255, A => 255);
    White  : constant Color := (R => 255, G => 255, B => 255, A => 255);
    Black  : constant Color := (R => 0,   G => 0,   B => 0,   A => 255);
-end ECS.Color;
+   
+end Graphics.Color;

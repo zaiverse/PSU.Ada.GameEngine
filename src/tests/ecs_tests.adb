@@ -3,6 +3,8 @@ with ecs.entity; use ecs.entity;
 with ecs.component; use ecs.component;
 with ecs.entity_manager; use ecs.entity_manager;
 with ecs.system; use ecs.system;
+with ECS.System.Movement; use ECS.System.Movement;
+with ECS.System.Collision; use ECS.System.Collision;
 with ecs.vec2; use ecs.vec2;
 
 procedure ECS_Tests is

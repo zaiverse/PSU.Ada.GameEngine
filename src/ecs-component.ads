@@ -1,6 +1,6 @@
 with Ada.Tags; use Ada.Tags;
 with ECS.Vec2;
-with ECS.Color; use ECS.Color;
+with Graphics.Color; use Graphics.Color;
 
 package ECS.Component is 
 
@@ -19,10 +19,10 @@ package ECS.Component is
     end record;
     -- Axis aligned bounding box for collision detection between objects
     type AABB_T is new Component_T with record
-        Left : Float;
+        Left   : Float;
         Bottom : Float;
-        Right : Float;
-        Top : Float;
+        Right  : Float;
+        Top    : Float;
     end record;
 
     type Collision_Params_T is new Component_T with record
@@ -35,10 +35,16 @@ package ECS.Component is
         Bottom_Bound : Boolean;
     end record;
 
-   type Shape_T is new Component_T with record
+   type Circle_T is new Component_T with record
       Sides    : Positive;
       Radius   : Positive;
-      C        : ECS.Color.Color;
+      C        : Color;
    end record;
-  
+   
+   type Quad_T is new Component_T with record
+      Width    : Float;
+      Height   : Float;
+      C        : Color;
+   end record; 
+
 end ECS.Component;

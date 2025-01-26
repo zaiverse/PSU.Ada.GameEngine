@@ -5,20 +5,25 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Win32; use Win32;
 package Window is
    pragma Elaborate_Body;
-   type Fixed_String is array (1 .. 100) of Character;
    
    type Window_T is tagged private;
    
    type Window_Access is access all Window_T'Class;
 
-   procedure Draw_Buffer(Window: in out Window_T; Buffer : System.Address);
-   function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access;
 
+
+   procedure Draw_Buffer(Buffer : System.Address);
+   function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access;
+   
+
+-- TODO: add get/set for record values
 
 private
    type Window_T is tagged record
       Height : Interfaces.C.int;
-      Width  : Interfaces.C.int;
+      Width  : Interfaces.C.int; 
+      Current_Width : Interfaces.C.int;
+      Current_Height : Interfaces.C.int;
       Title  : Unbounded_String;
       Handle : HWND := System.Null_Address;
    end record;
