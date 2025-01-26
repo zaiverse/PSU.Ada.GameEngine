@@ -4,9 +4,9 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Window; use Window;
 with Win32; use Win32;
 with System;
-with Renderer; use Renderer;
+with Graphics.Renderer; use Graphics.Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
-with ECS.Color; use ECS.Color;
+with Graphics.Color; use Graphics.Color;
 procedure Psu_Ada_Gameengine is            
 begin
    Put_Line ("Start Engine");

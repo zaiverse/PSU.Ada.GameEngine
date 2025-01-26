@@ -5,7 +5,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Win32; use Win32;
 package Window is
    pragma Elaborate_Body;
-   type Fixed_String is array (1 .. 100) of Character;
    
    type Window_T is tagged private;
    
@@ -15,6 +14,7 @@ package Window is
 
    procedure Draw_Buffer(Buffer : System.Address);
    function New_Window(Width : Interfaces.C.int; Height : Interfaces.C.int; Title : Unbounded_String) return Window_Access;
+   
 
 -- TODO: add get/set for record values
 

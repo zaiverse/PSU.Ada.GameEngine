@@ -4,9 +4,9 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Window; use Window;
 with Win32; use Win32;
 with System;
-with Renderer; use Renderer;
+with Graphics.Renderer; use Graphics.Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
-with ECS.Color; use ECS.Color;
+with Graphics.Color; use Graphics.Color;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 with ECS.Event; use ECS.Event;
 with ECS.Event_Manager; use ECS.Event_Manager;
@@ -79,10 +79,10 @@ Collision_Params_E1 : Component_Access := new Collision_Params_T'(
    Collision_Enabled => True,
    Collision_Occurred => False,
    Destroy_On_Collision => True,
-   Left_Bound => False,
-   Right_Bound => False,
-   Top_Bound => False,
-   Bottom_Bound => False
+   Left_Bound => True,
+   Right_Bound => True,
+   Top_Bound => True,
+   Bottom_Bound => True
 );
 C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 
@@ -128,7 +128,7 @@ begin
          Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
          -- Process emitted events here - for debug purposes
          Manager.all.update;
-         Clear_Screen(Buffer.all, ECS.Color.Blue, Width, Height);
+         Clear_Screen(Buffer.all, Graphics.Color.Blue, Width, Height);
          UserInput.Execute(To_Duration(Elapsed_Time), Manager);
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
          Mover.Execute(To_Duration(Elapsed_Time), Manager);

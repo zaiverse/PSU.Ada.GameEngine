@@ -1,5 +1,3 @@
-
-
 package body ECS.System.Movement is
    procedure Execute ( Self      : in out Mover_T;
                        Dt        : Duration; 

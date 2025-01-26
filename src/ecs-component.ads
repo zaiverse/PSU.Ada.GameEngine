@@ -1,6 +1,6 @@
 with Ada.Tags; use Ada.Tags;
 with ECS.Vec2;
-with ECS.Color; use ECS.Color;
+with Graphics.Color; use Graphics.Color;
 
 package ECS.Component is 
 
@@ -38,13 +38,13 @@ package ECS.Component is
    type Circle_T is new Component_T with record
       Sides    : Positive;
       Radius   : Positive;
-      C        : ECS.Color.Color;
+      C        : Color;
    end record;
    
    type Quad_T is new Component_T with record
       Width    : Float;
       Height   : Float;
-      C        : ECS.Color.Color;
+      C        : Color;
    end record; 
 
 end ECS.Component;

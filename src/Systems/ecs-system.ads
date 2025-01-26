@@ -4,7 +4,7 @@ with Ada.Tags; use Ada.Tags;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 with ECS.Event; use ECS.Event;
 with ECS.Event_Manager; use ECS.Event_Manager;
-with Renderer; use Renderer;
+with Graphics.Renderer; use Graphics.Renderer;
 with Ada.Text_IO; use Ada.Text_IO;
 with ECS.Vec2; use ECS.Vec2;
 with Win32; use Win32;

@@ -5,7 +5,7 @@ with Ada.Text_IO;   use Ada.Text_IO;
 -- with Window;        use Window;
 with Ada.Numerics.Elementary_Functions;
 
-package body renderer is
+package body Graphics.Renderer is
    package IC renames interfaces.C;
 
    type Point is record
@@ -23,7 +23,7 @@ package body renderer is
    end generic_swap;
    
    procedure set_pixel_color
-     (img : in out Byte_Array; x : Integer; y : Integer; c : color; Screen_Width : Natural; Screen_Height : Natural) is
+     (img : in out Byte_Array; x, y : Integer; c : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
      Index : Natural := ((y mod Screen_Height) * Screen_Width + (x mod Screen_Width) ) * 4;
    begin
       Img(Index)     := Byte(C.B);
@@ -32,7 +32,7 @@ package body renderer is
       Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
-   procedure Clear_Screen ( img : in out Byte_Array; c : color; Screen_Width : Natural; Screen_Height : Natural) is
+   procedure Clear_Screen ( img : in out Byte_Array; c : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       for Y in 0 .. Screen_Height - 1 loop
          for X in 0 .. Screen_Width - 1 loop
@@ -46,7 +46,7 @@ package body renderer is
       y0  : in out Integer;
       x1  : in out Integer;
       y1  : in out Integer;
-      c   : color;
+      c   : Graphics.Color.Color;
       img : in out Byte_Array;
       Screen_Width : Natural;
       Screen_Height : Natural)
@@ -114,7 +114,7 @@ package body renderer is
       Radius   : Positive;
       Center_X : float;
       Center_Y : float;
-      c        : Color;
+      c        : Graphics.Color.Color;
       Screen_Width    : Natural;
       Screen_Height   : Natural)
    is
@@ -132,7 +132,7 @@ package body renderer is
       end loop;
    end Draw_Regular_Polygon;
    -- Helper for Draw_Filled_Triangle
-   procedure DrawHorizontalLine(img : in out Byte_Array; X1,X2: in out Float; Y : Integer; C : Color; Screen_Width,Screen_Height : Natural) is
+   procedure DrawHorizontalLine(img : in out Byte_Array; X1,X2: in out Float; Y : Integer; C : Graphics.Color.Color; Screen_Width,Screen_Height : Natural) is
       procedure swap is new generic_swap(T => Float);
    begin
       -- make sure X1 is less than X2
@@ -145,7 +145,7 @@ package body renderer is
       
    end DrawHorizontalLine;
    -- Helper for Draw_Filled Triangle
-   procedure Fill_Top_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
+   procedure Fill_Top_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       -- Calculate slopes for the left and right edges
       LeftSlope : Float := (V3.X - V1.X) / (V3.Y - V1.Y);
@@ -163,7 +163,7 @@ package body renderer is
       end loop;
    end Fill_Top_Triangle;
    -- Helper for Draw_Filled_Triangle
-   procedure Fill_Bottom_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
+   procedure Fill_Bottom_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       -- Calculate slopes for the left and right edges
       LeftSlope : Float := (V2.X - V1.X) / (V2.Y - V1.Y);
@@ -179,7 +179,7 @@ package body renderer is
       end loop;
    end Fill_Bottom_Triangle;
    -- Scanline rasterization for filled triangle
-   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Color; Screen_Width, Screen_Height : Natural) is
+   procedure Draw_Filled_Triangle(img : in out Byte_Array; V1, V2, V3 : in out Vec2; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
       procedure swap is new generic_swap (T => Float);
    begin
       -- Sort vertices by Y
@@ -210,7 +210,7 @@ package body renderer is
       end if;
    end Draw_Filled_Triangle;
 
-   procedure Draw_Filled_Quad(img : in out Byte_Array; X,Y,Width,Height : Float; C : Color; Screen_Width, Screen_Height : Natural) is
+   procedure Draw_Filled_Quad(img : in out Byte_Array; X,Y,Width,Height : Float; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
       V1, V2, V3, V4, V5, V6 : Vec2;
    begin
       V1 := (X,Y);
@@ -247,4 +247,4 @@ package body renderer is
    --     end loop;
    --  end Draw_Image_To_Window;
 
-end Renderer;
+end Graphics.Renderer;
