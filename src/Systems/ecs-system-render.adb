@@ -31,6 +31,7 @@ package body ECS.System.Render is
                end;
             else
                Put_Line("Entity missing essential components");
+               return;
             end if;
          end;
       end loop; 

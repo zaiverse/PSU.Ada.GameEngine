@@ -71,7 +71,7 @@ Shape_P : Component_Access := new Quad_T'(
 );
 
    -- E1 components
-Transform_E1 : Component_Access := new Transform_T'(Position => (X => 600.0, Y => 100.0), Velocity => (X => 300.0, Y => 150.0), Rotation => 0.0);
+Transform_E1 : Component_Access := new Transform_T'(Position => (X => 600.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
 T_E1 : Transform_T renames Transform_T(Transform_E1.all);
 Rigidbody_E1 : Component_Access := new Rigidbody_T'(Mass => 1.0);
 AABB_E1      : Component_Access := new AABB_T;
@@ -133,8 +133,11 @@ begin
          Collision.Execute(To_Duration(Elapsed_Time),Manager);
          Mover.Execute(To_Duration(Elapsed_Time), Manager);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
+
+         Draw_String(Buffer.all, 200,200, 0,0, "HELLO TEAM", Graphics.Color.White, Width,Height);
          Draw_Buffer(Buffer.all'Address);
          delay 0.016; -- temporary measure to control frame rate
       end loop;
    end;
 end ECS_Window_System_Integration_Test;
+
