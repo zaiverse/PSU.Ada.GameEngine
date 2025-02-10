@@ -26,8 +26,20 @@ package body ECS.System.User_Input is
                   null;
             end case;
          when ECS.Event.KeyUp =>
-            T.Velocity.X := 0.0;
-            T.Velocity.Y := 0.0;
+            case Event.Data.KeyCode is
+               when 87 => -- W 
+                  T.Velocity.Y := 0.0;
+               when 83 => -- S
+                  T.Velocity.Y := 0.0;
+               when 65 => -- A
+                  T.Velocity.X := 0.0;
+               when 68 => -- D 
+                  T.Velocity.X := 0.0;
+               when 16#20# => -- Spacebar
+                  null;
+               when others =>
+                  null;
+            end case;
          -- I commented out all the click to move code because it is interfering with testing and 
          -- we need to discuss do we even want to support click to move or should it simply be optional
          -- in the context of a side scrolling 2D platformer we don't need it all but we might want to allow the option
