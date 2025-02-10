@@ -1,6 +1,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Graphics.Text;
 with Window; use Window;
 with Win32; use Win32;
 with System;
@@ -30,7 +31,7 @@ GameWindow : Window_Access;
 Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
 SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
 Start_Time, Stop_Time : Time;
-Elapsed_Time          : Time_Span;
+Elapsed_Time          : Duration;
 
 -- Entity Manager and Entities
 Manager : Manager_Access := new Entity_Manager_T'(Entities => Entity_List.Empty_Vector, 
@@ -38,6 +39,7 @@ Manager : Manager_Access := new Entity_Manager_T'(Entities => Entity_List.Empty_
 Event_Mgr : ECS.Event_Manager.Platform_Event_Handler_Access := new Platform_Event_Handler;
 Player : Entity_Access := Manager.all.AddEntity("Playr");
 E1 : Entity_Access := Manager.all.AddEntity("E0001");
+Score : Entity_Access := Manager.all.AddEntity ("Score");
 
 -- Systems
 Mover : Mover_T := (Width, Height);
@@ -92,7 +94,12 @@ Shape_E1 : Component_Access := new Quad_T'(
    C => (R => 255, G => 0, B => 0, A => 255)
 );
 
-
+Transform_Score : Component_Access := new Transform_T'((5.0,300.0),(50.0,0.0),0.0);
+Rigidbody_Score : Component_Access := new Rigidbody_T'(Mass=> 0.0);
+AABB_Score      : Component_Access := new AABB_T;
+Col_Score       : Component_Access := new Collision_Params_T'(False,False,False,False,False,False,False);
+Shape_Score     : Component_Access := new Quad_T'(0.0,0.0,(0,0,0,0));
+Text_Score      : Component_Access := new Text_T'(To_Unbounded_String ("TEST TEXT ENTITY"),(255,255,255,255));
 begin
       -- Add entity components
    Player.all.Add_Component(Transform_P);
@@ -105,6 +112,12 @@ begin
    E1.all.Add_Component(AABB_E1);
    E1.all.Add_Component(Collision_Params_E1);
    E1.all.Add_Component(Shape_E1);
+   Score.all.Add_Component(Transform_Score);
+   Score.all.Add_Component(Rigidbody_Score);
+   Score.all.Add_Component(AABB_Score);
+   Score.all.Add_Component(Col_Score);
+   Score.all.Add_Component(Shape_Score);
+   Score.all.Add_Component(Text_Score);
 
    Start_Time := Clock;
    Stop_Time := Clock;
@@ -118,25 +131,29 @@ begin
       Message        : MSG_Access := new MSG;
       Has_Msg        : Boolean := True;
       Lp_Result      : LRESULT;
-
+      FPS            : Integer;
    begin
       while Has_Msg loop
          Stop_Time := Clock;
-         Elapsed_Time := Stop_Time - Start_Time;
+         Elapsed_Time := To_Duration(Stop_Time - Start_Time);
+         FPS := Integer(1.0 / Float(Elapsed_Time));
          Start_Time := Stop_Time;
          Lp_Result := Dispatch_Message (Message);
          Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
          -- Process emitted events here - for debug purposes
          Manager.all.update;
-         Clear_Screen(Buffer.all, Graphics.Color.Blue, Width, Height);
-         UserInput.Execute(To_Duration(Elapsed_Time), Manager);
-         Collision.Execute(To_Duration(Elapsed_Time),Manager);
-         Mover.Execute(To_Duration(Elapsed_Time), Manager);
-         Render.Execute(To_Duration(Elapsed_Time), Manager);
+         Clear_Screen(Buffer.all,Graphics.Color.Blue, Width, Height);
+         UserInput.Execute(Elapsed_Time, Manager);
+         Collision.Execute(Elapsed_Time,Manager);
+         Mover.Execute(Elapsed_Time, Manager);
+         Render.Execute(Elapsed_Time, Manager);
 
          Draw_String(Buffer.all, 200,200, 0,0, "HELLO TEAM", Graphics.Color.White, Width,Height);
+         Draw_String(Buffer.all, 250, 250, 0, 0, "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ", (255,19,240,0), Width, Height); 
+         Draw_String(Buffer.all, 50, 50, 0, 0, "FPS:" & Integer'Image(FPS), Graphics.Color.Green, Width, Height);
          Draw_Buffer(Buffer.all'Address);
-         delay 0.016; -- temporary measure to control frame rate
+         --delay 0.008; -- temporary measure to control frame rate
+         
       end loop;
    end;
 end ECS_Window_System_Integration_Test;

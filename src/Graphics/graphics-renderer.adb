@@ -6,6 +6,14 @@ with Ada.Text_IO;   use Ada.Text_IO;
 with Ada.Numerics.Elementary_Functions;
 with Graphics.Text; use Graphics.Text;
 
+
+with Interfaces; use Interfaces;
+with System; use System;
+with System.Storage_Elements;
+with System.Address_To_Access_Conversions;
+
+
+
 package body Graphics.Renderer is
    package IC renames interfaces.C;
 
@@ -33,7 +41,7 @@ package body Graphics.Renderer is
       Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
-   procedure Clear_Screen ( img : in out Byte_Array; c : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
+   procedure Clear_Screen ( img : in out Byte_Array; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       for Y in 0 .. Screen_Height - 1 loop
          for X in 0 .. Screen_Width - 1 loop
@@ -240,7 +248,7 @@ procedure Draw_Character(
    StartX : Integer := X;
    StartY : Integer := Y;
 begin
-   for I in 1 .. C'Length - 1 loop
+   for I in 0 .. C'Length - 1 loop
       declare
          Bits : Graphics.Text.Text := C(I);
       begin

@@ -3,6 +3,12 @@ with Interfaces.C;
 with Win32; use Win32;
 with Graphics.Color; use Graphics.Color;
 with ECS.Vec2; use ECS.Vec2;
+
+with Interfaces; use Interfaces;
+with System; use System;
+with System.Storage_Elements;
+with System.Address_To_Access_Conversions;
+
 package Graphics.Renderer is
 
    type bool is new boolean;

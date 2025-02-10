@@ -1,4 +1,4 @@
-
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 package body ECS.System.Render is 
    -- Draw the entity to the screen
    procedure Execute (Self       : in out Render_T;
@@ -10,6 +10,7 @@ package body ECS.System.Render is
             Trans       : Component_Access   :=    Entity.all.Get_Component(Transform_T'Tag);
             Circle      : Component_Access   :=    Entity.all.Get_Component(Circle_T'Tag);
             Quad        : Component_Access   :=    Entity.all.Get_Component(Quad_T'Tag);
+            Text        : Component_Access   :=    Entity.all.Get_Component(Text_T'Tag);
          begin
             if Trans = null and Circle = null and Quad = null then
                Put_Line("Entity missing essential components");
@@ -28,6 +29,13 @@ package body ECS.System.Render is
                   Q renames Quad_T(Quad.all);
                begin
                   Draw_Filled_Quad (Self.Buffer.all,T.Position.X, T.Position.Y, Q.Width, Q.Height, Q.C,Self.Width, Self.Height);
+                  if Text /= null then
+                     declare
+                        Txt renames Text_T(Text.all);
+                     begin
+                        Draw_String (Self.Buffer.all, Integer(T.Position.X), Integer(T.Position.Y), 0, 0, To_String(Txt.Text), Txt.C, Self.Width,Self.Height);
+                     end;
+                  end if;
                end;
             else
                Put_Line("Entity missing essential components");

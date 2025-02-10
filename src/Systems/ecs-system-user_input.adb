@@ -20,6 +20,8 @@ package body ECS.System.User_Input is
                   T.Velocity.X := -200.0;
                when 68 => -- D 
                   T.Velocity.X := 200.0;
+               when 16#20# => -- Spacebar
+                  null;
                when others =>
                   null;
             end case;

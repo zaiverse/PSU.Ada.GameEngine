@@ -1,27 +1,26 @@
+with Ada.Unchecked_Conversion;
 with Graphics.Text; use Graphics.Text;
 with Ada.Text_IO; use Ada.Text_IO;
 
 
 procedure ECS_Test_Text is
-   C : Text_Array := Get_Character('C');
+
+   C : Text_Array := Get_Character('A');
 begin
-   for I in 1 .. C'Length - 1 loop
+   for I in 0 .. C'Length - 1 loop
       declare
-         Bits : Text := C(I);
+         Bits : Graphics.Text.Text := C(I);
       begin
          for J in reverse 0 .. 7 loop
             -- Print the most significant bit
             declare
                Bit : Integer := Integer((Bits / (2**J)) and 1);
             begin
-               if Bit = 1 then
-                  Put("XX");
-               else
-                  Put("..");
-               end if;
+               Put(Bit'Image);
             end;
          end loop;
-         Ada.Text_IO.New_Line;
+         New_Line;
       end;
    end loop;
+   
 end ECS_Test_Text;
