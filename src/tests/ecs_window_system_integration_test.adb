@@ -18,14 +18,16 @@ with ECS.System.Collision; use ECS.System.Collision;
 with ECS.System.Render; use ECS.System.Render;
 with ECS.System.User_Input; use ECS.System.User_Input;
 
+with Input_Callbacks; use Input_Callbacks;
+
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
 with Interfaces.C;
 
 procedure ECS_Window_System_Integration_Test is
 package IC renames Interfaces.C; use IC;
-Width : Integer := 800;
-Height : Integer := 600;
+Width : Integer := 640;
+Height : Integer := 360;
 Title : Unbounded_String := To_Unbounded_String("Game Window");
 GameWindow : Window_Access;
 Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
@@ -67,13 +69,13 @@ Collision_Params_P : Component_Access := new Collision_Params_T'(
 C_P : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
 
 Shape_P : Component_Access := new Quad_T'(
-   Width => 50.0,
-   Height => 50.0,
+   Width => 25.0,
+   Height => 25.0,
    C => (R=> 255, G => 255, B => 0, A => 255)
 );
 
    -- E1 components
-Transform_E1 : Component_Access := new Transform_T'(Position => (X => 600.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
+Transform_E1 : Component_Access := new Transform_T'(Position => (X => 300.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
 T_E1 : Transform_T renames Transform_T(Transform_E1.all);
 Rigidbody_E1 : Component_Access := new Rigidbody_T'(Mass => 1.0);
 AABB_E1      : Component_Access := new AABB_T;
@@ -89,8 +91,8 @@ Collision_Params_E1 : Component_Access := new Collision_Params_T'(
 C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 
 Shape_E1 : Component_Access := new Quad_T'(
-   Width => 100.0,
-   Height => 100.0,
+   Width => 50.0,
+   Height => 50.0,
    C => (R => 255, G => 0, B => 0, A => 255)
 );
 
@@ -100,7 +102,15 @@ AABB_Score      : Component_Access := new AABB_T;
 Col_Score       : Component_Access := new Collision_Params_T'(False,False,False,False,False,False,False);
 Shape_Score     : Component_Access := new Quad_T'(0.0,0.0,(0,0,0,0));
 Text_Score      : Component_Access := new Text_T'(To_Unbounded_String ("TEST TEXT ENTITY"),(255,255,255,255));
+
+
+
+
+
+
 begin
+
+   Register_Input_Callback (16#20#, TCB'Access);
       -- Add entity components
    Player.all.Add_Component(Transform_P);
    Player.all.Add_Component(Rigidbody_P);
@@ -125,8 +135,6 @@ begin
    GameWindow := New_Window(IC.int(Width),IC.int(Height),Title);
    Put_Line ("Start Engine");
  
-
-
    declare
       Message        : MSG_Access := new MSG;
       Has_Msg        : Boolean := True;

@@ -14,6 +14,7 @@ package ECS.Entity_Manager is
 
    type Manager_Access is access all Entity_Manager_T'Class;
    function AddEntity (Manager : in out Entity_Manager_T; Entity_Type : Id_T) return Entity_Access;
+   function GetEntity (Manager : in out Entity_Manager_T; Entity_Type : Id_T) return Entity_Access;
    procedure Update (Manager : in out Entity_Manager_T);
 
 end ECS.Entity_Manager;

@@ -1,5 +1,11 @@
 
 package body ECS.System.User_Input is 
+
+   procedure Register_Input_Callback(Key : Integer; Callback : Input_Callback) is
+   begin
+      Key_Callbacks(Key) := Callback;
+   end Register_Input_Callback;
+
    overriding procedure Execute ( Self      : in out User_Input_T;
                        Dt        : Duration;
                        Manager   : access Entity_Manager_T'Class) is
@@ -21,7 +27,9 @@ package body ECS.System.User_Input is
                when 68 => -- D 
                   T.Velocity.X := 200.0;
                when 16#20# => -- Spacebar
-                  null;
+                  if Key_Callbacks(16#20#) /= null then
+                     Key_Callbacks(16#20#).all(Manager);
+                  end if;
                when others =>
                   null;
             end case;

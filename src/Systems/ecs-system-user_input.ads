@@ -13,4 +13,7 @@ package ECS.System.User_Input is
                       Dt   : Duration;
                       Manager : access Entity_Manager_T'Class );
 
+
+   procedure Register_Input_Callback (Key : Integer; Callback : Input_Callback);
+
 end ECS.System.User_Input;
