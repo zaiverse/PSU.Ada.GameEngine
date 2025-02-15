@@ -27,10 +27,10 @@ package body Input_Callbacks is
       begin
          Bullet : Entity_Access := Manager.all.AddEntity ("B0001");
          StartPosX := (T.Position.X + (R.Width / 2.0)) ;
-         B_Trans := new Transform_T'((StartPosX,T.Position.Y),(0.0,-200.0),0.0);
+         B_Trans := new Transform_T'((StartPosX,T.Position.Y - 2.0),(0.0,-200.0),0.0);
          B_RBody := new Rigidbody_T'(Mass => 0.0);
          B_Shape := new Quad_T'(1.0,1.0,(255,255,255,255));
-         B_ColPar := new Collision_Params_T'(False,False,False,False);
+         B_ColPar := new Collision_Params_T'(True,False,True,True);
          declare
             BT renames Transform_T(B_Trans.all);
             BS renames Quad_T(B_Shape.all);

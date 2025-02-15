@@ -9,6 +9,7 @@ package body ECS.System.Movement is
             Rigidbodies : Component_Access   :=    Entity.all.Get_Component (Rigidbody_T'Tag);
             AABB        : Component_Access   :=    Entity.all.Get_Component (AABB_T'Tag);
             Quad        : Component_Access   :=    Entity.all.Get_Component (Quad_T'Tag);
+            Collision   : Component_Access   :=    Entity.all.Get_Component (Collision_Params_T'Tag);
             -- TODO: Add proper support for circle shaped objects
             
             begin
@@ -29,11 +30,17 @@ package body ECS.System.Movement is
                   return;
                end if;
 
+               if Collision = null then
+                  Put_Line ("No Collision Parameters on entity " & Entity.all.Id);
+                  return;
+               end if;
+
             declare
                T renames Transform_T (Trans.all);
                R renames Rigidbody_T (Rigidbodies.all);
                B renames AABB_T(AABB.all);
                Q renames Quad_T(Quad.all);
+               C renames Collision_Params_T(Collision.all);
                Velocity_Scaled : ECS.Vec2.Vec2 := New_Vec2(X_In => T.Velocity.X, Y_In => T.Velocity.Y);
                begin
                   Scale(Velocity_Scaled, Float(Dt));

@@ -55,8 +55,8 @@ T_P : Transform_T renames Transform_T(Transform_P.all);
 Rigidbody_P : Component_Access := new Rigidbody_T'(Mass => 1.0);
 AABB_P      : Component_Access := new AABB_T'(
    Left => T_P.Position.X, 
-   Bottom => T_P.Position.Y + 5.0, 
-   Right => T_P.Position.X + 5.0, 
+   Bottom => T_P.Position.Y, 
+   Right => T_P.Position.X, 
    Top => T_P.Position.Y);
 Collision_Params_P : Component_Access := new Collision_Params_T'(
    Collision_Enabled => True,
