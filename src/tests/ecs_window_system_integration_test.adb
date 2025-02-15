@@ -26,28 +26,29 @@ with Interfaces.C;
 
 procedure ECS_Window_System_Integration_Test is
 package IC renames Interfaces.C; use IC;
-Width : Integer := 640;
-Height : Integer := 360;
-Title : Unbounded_String := To_Unbounded_String("Game Window");
-GameWindow : Window_Access;
-Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
-SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
-Start_Time, Stop_Time : Time;
-Elapsed_Time          : Duration;
+Width       : Integer                  := 640;
+Height      : Integer                  := 360;
+Title       : Unbounded_String         := To_Unbounded_String("Game Window");
+GameWindow  : Window_Access;
+Buffer      : Win32.Byte_Array_Access  := new Win32.Byte_Array(0 .. Width * Height * 4);
+SkyBlue     : Color                    := (R => 135, G => 206, B => 236, A => 255);
+Start_Time  : Time;
+Stop_Time   : Time;
+Elapsed_Time: Duration;
 
 -- Entity Manager and Entities
-Manager : Manager_Access := new Entity_Manager_T'(Entities => Entity_List.Empty_Vector, 
+Manager     : Manager_Access           := new Entity_Manager_T'(Entities => Entity_List.Empty_Vector, 
                                                    ToBeAdded => Entity_List.Empty_Vector);
-Event_Mgr : ECS.Event_Manager.Platform_Event_Handler_Access := new Platform_Event_Handler;
-Player : Entity_Access := Manager.all.AddEntity("Playr");
-E1 : Entity_Access := Manager.all.AddEntity("E0001");
-Score : Entity_Access := Manager.all.AddEntity ("Score");
+Event_Mgr   : ECS.Event_Manager.Platform_Event_Handler_Access := new Platform_Event_Handler;
+Player      : Entity_Access            := Manager.all.AddEntity("Playr");
+E1          : Entity_Access            := Manager.all.AddEntity("E0001");
+Score       : Entity_Access            := Manager.all.AddEntity ("Score");
 
 -- Systems
-Mover : Mover_T := (Width, Height);
-Collision : Collision_T;
-Render : Render_T := (Width, Height, Buffer);
-UserInput : User_Input_T := (Player, Event_Mgr, False, True);
+Mover       : Mover_T      := (Width, Height);
+Collision   : Collision_T  := (Width, Height);
+Render      : Render_T     := (Width, Height, Buffer);
+UserInput   : User_Input_T := (Player, Event_Mgr, False, True);
 -- Player components
 Transform_P : Component_Access := new Transform_T'(Position => (X => 400.0, Y => 300.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
 T_P : Transform_T renames Transform_T(Transform_P.all);
@@ -61,32 +62,26 @@ Collision_Params_P : Component_Access := new Collision_Params_T'(
    Collision_Enabled => True,
    Collision_Occurred => False,
    Destroy_On_Collision => True,
-   Left_Bound => False,
-   Right_Bound => False,
-   Top_Bound => False,
-   Bottom_Bound => False
+   Wall_Collision => False
 );
-C_P : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
+C_P         : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
 
-Shape_P : Component_Access := new Quad_T'(
+Shape_P     : Component_Access := new Quad_T'(
    Width => 25.0,
    Height => 25.0,
    C => (R=> 255, G => 255, B => 0, A => 255)
 );
 
    -- E1 components
-Transform_E1 : Component_Access := new Transform_T'(Position => (X => 300.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
-T_E1 : Transform_T renames Transform_T(Transform_E1.all);
-Rigidbody_E1 : Component_Access := new Rigidbody_T'(Mass => 1.0);
-AABB_E1      : Component_Access := new AABB_T;
+Transform_E1: Component_Access := new Transform_T'(Position => (X => 300.0, Y => 100.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
+T_E1        : Transform_T renames Transform_T(Transform_E1.all);
+Rigidbody_E1: Component_Access := new Rigidbody_T'(Mass => 1.0);
+AABB_E1     : Component_Access := new AABB_T;
 Collision_Params_E1 : Component_Access := new Collision_Params_T'(
    Collision_Enabled => True,
    Collision_Occurred => False,
    Destroy_On_Collision => True,
-   Left_Bound => True,
-   Right_Bound => True,
-   Top_Bound => True,
-   Bottom_Bound => True
+   Wall_Collision => False
 );
 C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 
@@ -99,18 +94,19 @@ Shape_E1 : Component_Access := new Quad_T'(
 Transform_Score : Component_Access := new Transform_T'((5.0,300.0),(50.0,0.0),0.0);
 Rigidbody_Score : Component_Access := new Rigidbody_T'(Mass=> 0.0);
 AABB_Score      : Component_Access := new AABB_T;
-Col_Score       : Component_Access := new Collision_Params_T'(False,False,False,False,False,False,False);
+Col_Score       : Component_Access := new Collision_Params_T'(False,False,False,False);
 Shape_Score     : Component_Access := new Quad_T'(0.0,0.0,(0,0,0,0));
 Text_Score      : Component_Access := new Text_T'(To_Unbounded_String ("TEST TEXT ENTITY"),(255,255,255,255));
 
 
 
-
-
-
 begin
 
-   Register_Input_Callback (16#20#, TCB'Access);
+   Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+   Register_Input_Callback (16#57#, W_Key'Access);
+   Register_Input_Callback (16#41#, A_Key'Access);
+   Register_Input_Callback (16#53#, S_Key'Access);
+   Register_Input_Callback (16#44#, D_Key'Access);
       -- Add entity components
    Player.all.Add_Component(Transform_P);
    Player.all.Add_Component(Rigidbody_P);

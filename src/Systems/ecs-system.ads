@@ -19,7 +19,6 @@ package ECS.System is
 
    type System_Access is access all System_T'Class;
 
-   type Input_Callback is access procedure (Manager : access Entity_Manager_T'Class);
-   Key_Callbacks : array (0 .. 255) of Input_Callback := (others => null);
+
 
 end ECS.System; 
