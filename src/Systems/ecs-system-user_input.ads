@@ -13,4 +13,9 @@ package ECS.System.User_Input is
                       Dt   : Duration;
                       Manager : access Entity_Manager_T'Class );
 
+
+   type Input_Callback is access procedure (Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown : Boolean);
+   Key_Callbacks : array (0 .. 255) of Input_Callback := (others => null);
+   procedure Register_Input_Callback (Key : Integer; Callback : Input_Callback);
+
 end ECS.System.User_Input;

@@ -247,5 +247,4 @@ package body Window is
          Put_Line("StretchDIBits failed.");  
       end if;
    end Draw_Buffer;
-
 end Window;

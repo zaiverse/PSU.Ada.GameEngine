@@ -32,4 +32,13 @@ package body ecs.entity_manager is
     end loop;
   end Update;
     
+   function GetEntity(Manager : in out Entity_Manager_T; Entity_Type : Id_T) return Entity_Access is
+   begin
+      for E of Manager.Entities loop
+         if E.all.Id = Entity_Type then
+            return E;
+         end if;
+      end loop;
+      return null;
+   end GetEntity;
 end ecs.entity_manager;

@@ -33,10 +33,7 @@ procedure ECS_Integration_Test_One is
       Collision_Enabled => True,
       Collision_Occurred => False,
       Destroy_On_Collision => True,
-      Left_Bound => False,
-      Right_Bound => False,
-      Top_Bound => False,
-      Bottom_Bound => False
+      Wall_Collision => False
    );
    C_P : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
 
@@ -53,10 +50,7 @@ procedure ECS_Integration_Test_One is
       Collision_Enabled => True,
       Collision_Occurred => False,
       Destroy_On_Collision => True,
-      Left_Bound => False,
-      Right_Bound => False,
-      Top_Bound => False,
-      Bottom_Bound => False
+      Wall_Collision => False
    );
    C_E1 : Collision_Params_T renames Collision_Params_T(Collision_Params_E1.all);
 

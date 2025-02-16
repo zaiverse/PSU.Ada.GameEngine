@@ -47,10 +47,43 @@ package Win32 is
    WM_SIZING : constant := 16#0214#;         -- Sent while a window is being resized
    WM_GETMINMAXINFO : constant := 16#0024#;  -- Sent to determine minimum and maximum window sizes
    WM_WINDOWPOSCHANGED : constant := 16#0047#; -- Sent after a window's position or size changes
+    -- Text Formating options, used in DrawTextA as a bit mask ( e.g., DT_LEFT | DTVCENTER)
+    -- Horizontal Alignment
+   DT_LEFT      : constant := 16#0000#; -- Align text to the left
+   DT_CENTER    : constant := 16#0001#; -- Center text horizontally
+   DT_RIGHT     : constant := 16#0002#; -- Align text to the right
 
-   type LPCSTR is access constant IC.char;
-   type LPSTR is access all IC.char;
+   -- Vertical Alignment
+   DT_TOP       : constant := 16#0000#; -- Align text to the top (default)
+   DT_VCENTER   : constant := 16#0004#; -- Center text vertically
+   DT_BOTTOM    : constant := 16#0008#; -- Align text to the bottom
 
+   -- Text Formatting
+   DT_WORDBREAK : constant := 16#0010#; -- Automatically break lines
+   DT_SINGLELINE: constant := 16#0020#; -- Single line (ignore word wrapping)
+   DT_EXPANDTABS: constant := 16#0040#; -- Expand tab characters
+   DT_TABSTOP   : constant := 16#0080#; -- Set tab stops (use `DT_EXPANDTABS`)
+   DT_NOCLIP    : constant := 16#0100#; -- Do not clip text (allow drawing outside rect)
+   DT_EXTERNALLEADING : constant := 16#0200#; -- Include external leading in height calculations
+
+   -- Ellipsis & Trimming
+   DT_CALCRECT  : constant := 16#0400#; -- Calculate the bounding rectangle without drawing
+   DT_NOPREFIX  : constant := 16#0800#; -- Ignore `&` prefix for shortcut keys
+   DT_INTERNAL  : constant := 16#1000#; -- Use system font metrics
+
+   -- Ellipsis options (used when text overflows)
+   DT_END_ELLIPSIS   : constant := 16#8000#; -- Add `...` at the end of overflowing text
+   DT_PATH_ELLIPSIS  : constant := 16#4000#; -- Add `...` in the middle of a file path
+   DT_WORD_ELLIPSIS  : constant := 16#20000#; -- Add `...` at the end of last visible word
+
+   -- Used in SetBkMode
+   TRANSPARENT  : constant := 1;  -- Background is transparent (no fill behind text)
+   OPAQUE       : constant := 2;  -- Background is filled with the current background color
+
+ --  type LPCSTR is access constant IC.char;
+   type LPCSTR is new ICS.chars_ptr;
+ --  type LPSTR is access all IC.char;
+   type LPSTR is new ICS.chars_ptr;
    IDI_APPLICATION : LPCSTR;
    IDC_ARROW       : LPCSTR;
 
@@ -101,6 +134,16 @@ package Win32 is
       biClrImportant  : DWORD   := 0;
    end record;
 
+   type BITMAP is record
+      bmType         : IC.long;
+      bmWidth        : IC.long;
+      bmHeight       : IC.long;
+      bmWidthBytes   : IC.long;
+      bmPlanes       : IC.short;
+      bmBitsPixel    : IC.short;
+      bmBits         : System.Address;
+   end record;
+
    type RGBQUAD is record
       rgbBlue     : Byte := 0;
       rgbGreen    : Byte := 0;
@@ -134,9 +177,9 @@ package Win32 is
 
    function TO_LPCSTR is new Ada.Unchecked_Conversion (IC.Strings.chars_ptr, LPCSTR);
 
-   Lp_Window_Name : LPCSTR := TO_LPCSTR (ICS.New_String ("Ada Window"));
-   Lp_Class_Name  : LPCSTR := TO_LPCSTR (ICS.New_String ("Core"));
-   Lp_Menu_Name   : LPCSTR := TO_LPCSTR (ICS.New_String (""));
+   Lp_Window_Name : LPCSTR := LPCSTR(ICS.New_String ("Ada Window"));
+   Lp_Class_Name  : LPCSTR := LPCSTR(ICS.New_String ("Core"));
+   Lp_Menu_Name   : LPCSTR := LPCSTR(ICS.New_String (""));
 
    type WNDCLASS is record
       Style           : IC.unsigned := CS_HREDRAW or CS_VREDRAW;
@@ -175,13 +218,50 @@ package Win32 is
    type RECT_Access is access all RECT;
 
    type PAINTSTRUCT is record
-      H_dc         : HDC :=  System.Null_Address;
-      F_Erase      : Boolean := False;
+      H_dc         : HDC;
+      F_Erase      : Interfaces.C.int;
       Rc_Paint     : RECT;
-      F_Restore    : Boolean := False;
-      F_Inc_Update : Boolean := False;
-      Rgb_Reserved : Byte_Array (0 .. 31) := (others => 0);
+      F_Restore    : Interfaces.C.int;
+      F_Inc_Update : Interfaces.C.int;
+      Rgb_Reserved : Interfaces.C.char_array(0 .. 31);
    end record;
+
+   function Draw_Text_A(
+      H_dc        : HDC;
+      Lp_Ch_Text  : LPCSTR;
+      C_Ch_Text   : IC.int;
+      Lp_Rc       : in out RECT;
+      Format      : IC.unsigned
+   ) return IC.int
+   with Import => True, Convention => C, External_Name => "DrawTextA";
+
+   function Text_Out_A(
+      H_dc        : HDC;
+      x           : IC.int;
+      y           : IC.int;
+      Lp_String   : LPCSTR;
+      len         : IC.int
+   ) return Boolean
+   with Import => True, Convention => C, External_Name => "TextOutA";
+
+   function Set_Text_Color(
+      H_dc        : HDC;
+      Color       : DWORD
+   ) return DWORD
+   with Import => True, Convention => C, External_Name => "SetTextColor";
+
+   function Set_Bk_Mode(
+      H_dc        : HDC;
+      Mode        : IC.int
+   ) return IC.int
+   with Import => True, Convention => C, External_Name => "SetBkMode";
+
+   function Create_Compatible_Bitmap(
+      H_dc        : HDC;
+      Cx          : IC.int;
+      Cy          : IC.int
+   ) return HBITMAP
+   with Import => True, Convention => C, External_Name => "CreateCompatibleBitmap";  
 
    function Begin_Paint (H_Wnd : HWND; Lp_Paint : access PAINTSTRUCT) return HDC
    with Import => True, Convention => C, External_Name => "BeginPaint";
@@ -206,6 +286,13 @@ package Win32 is
 
    procedure Post_Quit_Message (N_Exit_Code : IC.int)
    with Import => True, Convention => C, External_Name => "PostQuitMessage";
+
+   function Get_Object(
+      h  : HANDLE;
+      c  : IC.int;
+      pv : LPVOID
+   ) return IC.int
+   with Import => True, Convention => C, External_Name => "GetObject";
 
    function Def_Window_Proc
      (H_Wnd   : HWND;

@@ -4,6 +4,15 @@ with Ada.Tags;      use Ada.Tags;
 with Ada.Text_IO;   use Ada.Text_IO;
 -- with Window;        use Window;
 with Ada.Numerics.Elementary_Functions;
+with Graphics.Text; use Graphics.Text;
+
+
+with Interfaces; use Interfaces;
+with System; use System;
+with System.Storage_Elements;
+with System.Address_To_Access_Conversions;
+
+
 
 package body Graphics.Renderer is
    package IC renames interfaces.C;
@@ -32,7 +41,7 @@ package body Graphics.Renderer is
       Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
-   procedure Clear_Screen ( img : in out Byte_Array; c : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
+   procedure Clear_Screen ( img : in out Byte_Array; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       for Y in 0 .. Screen_Height - 1 loop
          for X in 0 .. Screen_Width - 1 loop
@@ -196,13 +205,14 @@ package body Graphics.Renderer is
          swap(V1.X, V2.X);
          swap(V1.Y, V2.Y);
       end if;
-      -- Split triangle into top-flat and bottom-flat
+      -- Check if triangle is flat-top (i.e. the bottom part of a split triangle, maybe this needs to be renamed)
       if V2.Y = V3.Y then
          Fill_Bottom_Triangle(img, V1, V2, V3, C, Screen_Width,Screen_Height);
+      -- Check if triangle is flat-bottomed 
       elsif V1.Y = V2.Y then
          Fill_Top_Triangle(img, V1, V2, V3, C, Screen_Width,Screen_Height);
       else
-         -- Split Vertex
+         -- Split triangle into flat-top and flat-bottom triangle
          SplitX : Float := V1.X + (V2.Y - V1.Y) / (V3.Y - V1.Y) * (V3.X - V1.X);
          SplitVertex : Vec2 := (SplitX, V2.Y);
          Fill_Bottom_Triangle(img, V1, V2, SplitVertex, C, Screen_Width, Screen_Height);
@@ -213,6 +223,7 @@ package body Graphics.Renderer is
    procedure Draw_Filled_Quad(img : in out Byte_Array; X,Y,Width,Height : Float; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
       V1, V2, V3, V4, V5, V6 : Vec2;
    begin
+      -- Draw triangle takes in the vertices as reference and swaps them so we need 6 vertices instead of 4 for the quad
       V1 := (X,Y);
       V2 := (X, Y + Height);
       V3 := (X + Width, Y);
@@ -224,6 +235,61 @@ package body Graphics.Renderer is
       -- Draw flat-bottom triangle
       Draw_Filled_Triangle(img, V4, V5, V6, C, Screen_Width, Screen_Height);
    end Draw_Filled_Quad;
+
+procedure Draw_Character(
+   img                           : in out Byte_Array; 
+   X, Y, Width, Height           : Integer; 
+   Char                          : Character; 
+   color                         : Graphics.Color.Color; 
+   Screen_Width, Screen_Height   : Natural
+   ) 
+   is
+   C : Text_Array := Get_Character(Char);
+   StartX : Integer := X;
+   StartY : Integer := Y;
+begin
+   for I in 0 .. C'Length - 1 loop
+      declare
+         Bits : Graphics.Text.Text := C(I);
+      begin
+         for J in reverse 0 .. 7 loop
+            -- Print the most significant bit
+            declare
+               Bit : Integer := Integer((Bits / (2**J)) and 1);
+            begin
+               if Bit = 1 then
+                  set_pixel_color (img, StartX, StartY, color, Screen_Width, Screen_Height); -- Print the pixel and move to the next position
+                  StartX := StartX + 1;
+               else
+                  StartX := StartX + 1; 
+               end if;
+            end;
+         end loop;
+         StartY := StartY + 1; -- New line
+         StartX := X;          -- Reset cursor
+      end;
+   end loop;
+end Draw_Character;
+
+procedure Draw_String(
+   img                           : in out Byte_Array; 
+   X,Y                           : Integer;
+   Width, Height                 : Integer; 
+   S                             : in String;
+   Color                         : Graphics.Color.Color;
+   Screen_Width, Screen_Height   : Natural
+   ) 
+   is
+   StartX   : Integer := X;
+   StartY   : Integer := Y;
+   Char     : Character;        
+begin
+   for I in 1 .. S'Length loop
+      Char := S(I);
+      Draw_Character (img, StartX, StartY, Width, Height, Char, Color, Screen_Width, Screen_Height);
+      StartX := StartX + 10; -- Temporary magic number until size scaling is in place
+   end loop;
+end Draw_String;
 
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;
