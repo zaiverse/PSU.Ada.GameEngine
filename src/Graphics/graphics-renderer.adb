@@ -291,6 +291,40 @@ begin
    end loop;
 end Draw_String;
 
+   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height : Integer; Screen_Width, Screen_Height : Natural) is
+
+   begin
+
+      for I in 0 .. (Height - 1) loop
+         begin
+            for J in 0 .. (Width - 1) loop
+               declare
+                  Img_Index : Natural := (I * Width + J) * 4 + 1;
+                  -- need to offset the buffer index by the x and y values            
+                  Buffer_Index : Natural := ((Y mod Screen_Height + I) * Screen_Width + (X mod Screen_Width + J) ) * 4;
+               begin
+                  if X + J < Screen_Width and Y + I < Screen_Height then
+
+                     --  Put_Line("Buffer Index: " & Buffer_Index'Image & " Img Index: " & Img_Index'Image);
+
+                     -- NOTE: The QOI image supports full alpha range, but the buffer does not
+                     if img.all(Storage_Offset(Img_Index+3)) /= 0 then
+
+                        buffer(Buffer_Index) := Byte(img.all(Storage_Offset(Img_Index+1)));
+                        buffer(Buffer_Index+1) := Byte(img.all(Storage_Offset(Img_Index+2)));
+                        buffer(Buffer_Index+2) := Byte(img.all(Storage_Offset(Img_Index)));
+                        buffer(Buffer_Index+3) := Byte(img.all(Storage_Offset(Img_Index+3)));
+
+                     end if;
+
+                  end if;
+               end;
+            end loop;
+         end;
+      end loop;
+
+   end Draw_Image_To_Buffer;
+
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;
 
