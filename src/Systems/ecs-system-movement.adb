@@ -25,7 +25,7 @@ package body ECS.System.Movement is
                   Put_Line ("No AABB on entity " & Entity.all.Id);
                   return;
                end if;
-               if AABB = null then 
+               if Quad = null then 
                   Put_Line ("No Quad on entity " & Entity.all.Id);
                   return;
                end if;

@@ -3,15 +3,18 @@ with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
 package body Input_Callbacks is 
 
-   Player_Entity : Entity_Access := null;
+   
    Last_Fired : Duration := 0.0;
 
    procedure Spawn_Bullet(Manager : access Entity_Manager_T'Class) is
       Trans    : Component_Access;
       Rect     : Component_Access;
+      Player_Entity : Entity_Access;
    begin
+      Player_Entity := Manager.GetEntity("Playr");
       if Player_Entity = null then
-         Player_Entity := Manager.GetEntity("Playr");
+         Put_Line ("Player entity not found");
+         return;
       end if;
       Trans := Player_Entity.all.Get_Component(Transform_T'Tag);
       Rect :=  Player_Entity.all.Get_Component(Quad_T'Tag);
@@ -30,7 +33,7 @@ package body Input_Callbacks is
          B_Trans := new Transform_T'((StartPosX,T.Position.Y - 2.0),(0.0,-200.0),0.0);
          B_RBody := new Rigidbody_T'(Mass => 0.0);
          B_Shape := new Quad_T'(1.0,1.0,(255,255,255,255));
-         B_ColPar := new Collision_Params_T'(True,False,True,True);
+         B_ColPar := new Collision_Params_T'(False,False,True,True);
          declare
             BT renames Transform_T(B_Trans.all);
             BS renames Quad_T(B_Shape.all);
@@ -64,9 +67,12 @@ package body Input_Callbacks is
 
    procedure W_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
    Trans : Component_Access;
+      Player_Entity : Entity_Access;
    begin
+      Player_Entity := Manager.GetEntity("Playr");
       if Player_Entity = null then
-         Player_Entity := Manager.GetEntity("Playr");
+         Put_Line ("Player entity not found");
+         return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
       declare
@@ -79,11 +85,15 @@ package body Input_Callbacks is
          end if;
       end; 
    end W_Key;
+
    procedure A_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Player_Entity : Entity_Access;
    begin
+      Player_Entity := Manager.GetEntity("Playr");
       if Player_Entity = null then
-         Player_Entity := Manager.GetEntity("Playr");
+         Put_Line ("Player entity not found");
+         return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
       declare
@@ -96,11 +106,15 @@ package body Input_Callbacks is
          end if;
       end; 
    end A_Key;
+
    procedure S_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Player_Entity : Entity_Access;
    begin
+      Player_Entity := Manager.GetEntity("Playr");
       if Player_Entity = null then
-         Player_Entity := Manager.GetEntity("Playr");
+         Put_Line ("Player entity not found");
+         return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
       declare
@@ -113,11 +127,15 @@ package body Input_Callbacks is
          end if;
       end; 
    end S_Key;   
+
    procedure D_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Player_Entity : Entity_Access;
    begin
+      Player_Entity := Manager.GetEntity("Playr");
       if Player_Entity = null then
-         Player_Entity := Manager.GetEntity("Playr");
+         Put_Line ("Player entity not found");
+         return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
       declare

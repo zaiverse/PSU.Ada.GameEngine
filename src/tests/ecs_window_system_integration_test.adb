@@ -144,7 +144,6 @@ begin
          Start_Time := Stop_Time;
          Lp_Result := Dispatch_Message (Message);
          Has_Msg := Get_Message (Message, System.Null_Address, 0, 0);
-         -- Process emitted events here - for debug purposes
          Manager.all.update;
          Clear_Screen(Buffer.all,Graphics.Color.Blue, Width, Height);
          UserInput.Execute(Elapsed_Time, Manager);
@@ -152,12 +151,12 @@ begin
          Mover.Execute(Elapsed_Time, Manager);
          Render.Execute(Elapsed_Time, Manager);
 
-         Draw_String(Buffer.all, 200,200, 0,0, "HELLO TEAM", Graphics.Color.White, Width,Height);
+         Draw_String(Buffer.all, 200,200, 0, 0, "HELLO TEAM", Graphics.Color.White, Width,Height);
          Draw_String(Buffer.all, 250, 250, 0, 0, "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ", (255,19,240,0), Width, Height); 
          Draw_String(Buffer.all, 50, 50, 0, 0, "FPS:" & Integer'Image(FPS), Graphics.Color.Green, Width, Height);
+         Draw_String(Buffer.all, 50, 65, 0, 0, "ENTITY COUNT:" & Manager.all.Entities.Length'Image, Graphics.Color.Green,Width,Height);
          Draw_Buffer(Buffer.all'Address);
          --delay 0.008; -- temporary measure to control frame rate
-         
       end loop;
    end;
 end ECS_Window_System_Integration_Test;
