@@ -11,6 +11,7 @@ package body ECS.System.Render is
             Circle      : Component_Access   :=    Entity.all.Get_Component(Circle_T'Tag);
             Quad        : Component_Access   :=    Entity.all.Get_Component(Quad_T'Tag);
             Text        : Component_Access   :=    Entity.all.Get_Component(Text_T'Tag);
+            Texture     : Component_Access   :=    Entity.all.Get_Component(Texture_T'Tag);
          begin
             if Trans = null and Circle = null and Quad = null then
                Put_Line("Entity missing essential components");
@@ -22,6 +23,14 @@ package body ECS.System.Render is
                   C renames Circle_T(Circle.all);
                begin
                   Draw_Regular_Polygon(Self.Buffer.all, C.Sides, C.Radius, T.Position.X,T.Position.Y, C.C, Self.Width, Self.Height);
+               end;
+            elsif Trans /= null and Texture /= null then
+               declare
+                  T renames Transform_T(Trans.all);
+                  Tx renames Texture_T(Texture.all);
+               begin
+                  --  Put_Line("Drawing texture at " & Integer'Image(Integer(T.Position.X)) & " " & Integer'Image(Integer(T.Position.Y)));
+                  Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X) + 1, Integer(T.Position.Y) + 1, Tx.Width, Tx.Height, Self.Width, Self.Height);
                end;
             elsif Trans /= null and Quad /= null then
                declare

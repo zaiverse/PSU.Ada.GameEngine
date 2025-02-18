@@ -3,13 +3,13 @@ with Interfaces.C;
 with Win32; use Win32;
 with Graphics.Color; use Graphics.Color;
 with ECS.Vec2; use ECS.Vec2;
-
 with Interfaces; use Interfaces;
 with System; use System;
-with System.Storage_Elements;
+with System.Storage_Elements; use System.Storage_Elements;
 with System.Address_To_Access_Conversions;
-
 package Graphics.Renderer is
+
+  type Storage_Array_Access is access all Storage_Array;
 
    type bool is new boolean;
    for bool'size use 8;
@@ -49,6 +49,9 @@ package Graphics.Renderer is
    procedure Draw_Character(img : in out Byte_Array; X,Y,Width,Height : Integer; Char : Character; color : Graphics.Color.Color; Screen_Width, Screen_Height : Natural);
    procedure Draw_String(img : in out Byte_Array; X,Y : Integer; Width, Height : Integer; S : in String; Color : Graphics.Color.Color; Screen_Width, Screen_Height : Natural);
    
+
+   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height : Integer; Screen_Width, Screen_Height : Natural);
+
 
    generic
       type t is private;
