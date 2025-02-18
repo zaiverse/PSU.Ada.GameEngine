@@ -2,6 +2,7 @@ with Ada.Tags; use Ada.Tags;
 with ECS.Vec2;
 with Graphics.Color; use Graphics.Color;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Graphics.Renderer; use Graphics.Renderer;
 
 package ECS.Component is 
 
@@ -43,11 +44,17 @@ package ECS.Component is
       Width    : Float;
       Height   : Float;
       C        : Color;
-   end record; 
+   end record;
 
    type Text_T is new Component_T with record
       Text    : Unbounded_String;
       C       : Color;
+   end record;
+
+   type Texture_T is new Component_T with record
+      Width    : Integer;
+      Height   : Integer;
+      Data : Storage_Array_Access;
    end record;
 
 end ECS.Component;
