@@ -1,5 +1,4 @@
 with ecs.entity; use ecs.entity;
-
 package body ecs.entity_manager is
 
   Entity_Count : Positive := 1;
@@ -27,6 +26,7 @@ package body ecs.entity_manager is
   -- Remove destroyed Entities
     for I in reverse Manager.Entities.First_Index .. Manager.Entities.Last_Index loop
       if Manager.Entities(I).all.Destroyed then
+      
         Manager.Entities.Delete(I);
       end if;
     end loop;
