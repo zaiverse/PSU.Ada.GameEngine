@@ -104,7 +104,7 @@ procedure ECS_Component_Texture_Transparency_Test is
     -- Static Entity components
   Transform_S        : Component_Access :=
    new Transform_T'
-    (Position => (X => 50.0, Y => 50.0), Velocity => (X => 0.0, Y => 0.0),
+    (Position => (X => 0.0, Y => 0.0), Velocity => (X => 0.0, Y => 0.0),
      Rotation => 0.0);
   T_S                : Transform_T renames Transform_T (Transform_S.all);
   Rigidbody_S        : Component_Access := new Rigidbody_T'(Mass => 1.0);
@@ -134,9 +134,9 @@ procedure ECS_Component_Texture_Transparency_Test is
   TextBuffer : Ada.Streams.Stream_Element_Array (1 .. 200);
   Last       : Ada.Streams.Stream_Element_Offset;
   Red_Ball_File_Name  : constant String :=
-   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\red.qoi";
+   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\terrace_360.qoi";
   Green_Ball_File_Name  : constant String :=
-   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\green.qoi";
+   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\char.qoi";
 
   -- from the example in the QOI package
   -- https://github.com/Fabien-Chouteau/qoi-spark/blob/main/tests/src/tests.adb
@@ -239,12 +239,12 @@ begin
    --   Put_Line (Texture_Image_S.Data.all((Texture_Image_S.Data'Length / 2))'Image);
 
     Texture_P := new Texture_T'
-      (Width => Integer(Texture_Image_P.Desc.Width), Height => Integer(Texture_Image_P.Desc.Width), Data => Texture_Image_P.Data);
+      (Width => Integer(Texture_Image_P.Desc.Width), Height => Integer(Texture_Image_P.Desc.Height), Data => Texture_Image_P.Data);
 
     Player.all.Add_Component (Texture_P);
 
     Texture_S := new Texture_T'
-      (Width => Integer(Texture_Image_S.Desc.Width), Height => Integer(Texture_Image_S.Desc.Width), Data => Texture_Image_S.Data);
+      (Width => Integer(Texture_Image_S.Desc.Width), Height => Integer(Texture_Image_S.Desc.Height), Data => Texture_Image_S.Data);
 
    Static_Entity.all.Add_Component (Texture_S);
 

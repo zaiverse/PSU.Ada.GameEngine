@@ -104,10 +104,11 @@ procedure ECS_Component_Texture_Test is
   TextBuffer : Ada.Streams.Stream_Element_Array (1 .. 200);
   Last       : Ada.Streams.Stream_Element_Offset;
   File_Name  : constant String :=
-   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\apple_with_transparency.qoi";
+   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\char.qoi";
 
   -- from the example in the QOI package
   -- https://github.com/Fabien-Chouteau/qoi-spark/blob/main/tests/src/tests.adb
+
   function Load_QOI (Filename : String) return Input_Data is
     use GNAT.OS_Lib;
 
@@ -195,7 +196,7 @@ begin
     Put_Line (Texture_Image.Data.all(4)'Image);
 
     Texture_P := new Texture_T'
-      (Width => Integer(Texture_Image.Desc.Width), Height => Integer(Texture_Image.Desc.Width), Data => Texture_Image.Data);
+      (Width => Integer(Texture_Image.Desc.Width), Height => Integer(Texture_Image.Desc.Height), Data => Texture_Image.Data);
 
     Player.all.Add_Component (Texture_P);
 
