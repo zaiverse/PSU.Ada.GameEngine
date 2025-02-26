@@ -74,7 +74,7 @@ procedure ECS_Component_Texture_Test is
 
 
 -- Player components
-Transform_P : Component_Access := new Transform_T'(Position => (X => 400.0, Y => 300.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
+Transform_P : Component_Access := new Transform_T'(Position => (X => 50.0, Y => 150.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
 T_P : Transform_T renames Transform_T(Transform_P.all);
 Rigidbody_P : Component_Access := new Rigidbody_T'(Mass => 1.0);
 AABB_P      : Component_Access := new AABB_T'(
@@ -110,7 +110,7 @@ Shape_P     : Component_Access := new Quad_T'(
     (Left  => T_G.Position.X, Bottom => T_G.Position.Y + 5.0,
      Right => T_G.Position.X + 5.0, Top => T_G.Position.Y);
   Collision_Params_G : Component_Access := new Collision_Params_T'(
-    Collision_Enabled => True,
+    Collision_Enabled => False,
     Collision_Occurred => False,
     Destroy_On_Collision => True,
     Wall_Collision => False
