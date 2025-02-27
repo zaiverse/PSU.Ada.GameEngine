@@ -114,7 +114,7 @@ package body Input_Callbacks is
             (Width => Integer(Texture_Image.Desc.Width), Height => Integer(Texture_Image.Desc.Height), Data => Texture_Image.Data);
          Bullet : Entity_Access := Manager.all.AddEntity ("B0001");
          StartPosX := (T.Position.X + (R.Width / 2.0)) ;
-         B_Trans := new Transform_T'((StartPosX + 22.0,T.Position.Y),(200.0,0.0),0.0);
+         B_Trans := new Transform_T'((StartPosX + 22.0,T.Position.Y),(400.0,0.0),0.0);
          B_RBody := new Rigidbody_T'(Mass => 0.0);
          B_Shape := new Quad_T'(22.0,22.0,(255,255,255,255));
          B_ColPar := new Collision_Params_T'(True,False,True,True);
@@ -136,7 +136,7 @@ package body Input_Callbacks is
 
 
    procedure Space_Key (Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
-      Cooldown   : constant Duration := 0.0;
+      Cooldown   : constant Duration := 0.02;
    begin
       if KeyDown then
          Last_Fired := Last_Fired + Dt;
