@@ -27,7 +27,6 @@ with Window;                use Window;
 with Input_Callbacks; use Input_Callbacks;
 
 procedure System_Demo is
-
    package IC renames Interfaces.C;
    use IC;
    Width                 : Integer                 := 640;
@@ -36,20 +35,17 @@ procedure System_Demo is
    GameWindow            : Window_Access;
    Buffer                : Win32.Byte_Array_Access := new Win32.Byte_Array (0 .. Width * Height * 4);
    Start_Time, Stop_Time : Time;
-   Elapsed_Time          : Time_Span;
-
+   Elapsed_Time          : Duration;
    -- Entity Manager and Entities
    Manager               : Manager_Access           := new Entity_Manager_T' (Entity_List.Empty_Vector,Entity_List.Empty_Vector);
    Event_Mgr             : Platform_Event_Handler_Access := new Platform_Event_Handler;
    Player                : Entity_Access            := Manager.all.AddEntity ("Playr");
-
    -- Systems
    Mover              : Mover_T          := (Width, Height);
    Collision          : Collision_T      := (Width, Height);
    Render             : Render_T         := (Width, Height, Buffer);
    UserInput          : User_Input_T     := (Player, Event_Mgr, False, True);
    EnemySpawner       : Enemy_Spawn_T;
-
    -- Player components
    Transform_P : Component_Access := new Transform_T'(Position => (X => 50.0, Y => 150.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
    T_P : Transform_T renames Transform_T(Transform_P.all);
@@ -66,79 +62,70 @@ procedure System_Demo is
       Wall_Collision => False
    );
    C_P         : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
-
    Shape_P     : Component_Access := new Quad_T'(
       Width => 36.0,
       Height => 54.0,
       C => (R=> 255, G => 255, B => 0, A => 255)
    );
 
-  -- Load Texture
-
    Texture_P : Component_Access;
    bkgrd  : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\terrace_360.qoi";
    player_texture : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\char.qoi";
-
 begin
-
+   -- Define input keys
    Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
    Register_Input_Callback (16#57#, W_Key'Access);
    Register_Input_Callback (16#41#, A_Key'Access);
    Register_Input_Callback (16#53#, S_Key'Access);
    Register_Input_Callback (16#44#, D_Key'Access);
-
    -- Add entity components
    Player.all.Add_Component (Transform_P);
    Player.all.Add_Component (Rigidbody_P);
    Player.all.Add_Component (AABB_P);
    Player.all.Add_Component (Collision_Params_P);
    Player.all.Add_Component (Shape_P);
-
+   -- Used to calculate the frame time
    Start_Time := Clock;
    Stop_Time  := Clock;
-
    GameWindow := New_Window (IC.int (Width), IC.int (Height), Title);
-
    declare
       Message           : MSG_Access := new MSG;
       Has_Msg           : Boolean    := True;
       Lp_Result         : LRESULT;
       Texture_Image     : QOI_Image_Data;
       Background_Image  : QOI_Image_Data;
-
    begin
-
+      -- Load textures
       Background_Image    := Load_QOI (bkgrd);
       Texture_Image       := Load_QOI(player_texture);
       Texture_P           := new Texture_T'(Integer(Texture_Image.Desc.Width),Integer(Texture_Image.Desc.Height),Texture_Image.Data);
-
       Player.all.Add_Component (Texture_P);
-
+      -- Windows message loop (game loop)
       while Has_Msg loop
          Stop_Time    := Clock;
-         Elapsed_Time := Stop_Time - Start_Time;
+         Elapsed_Time := To_Duration(Stop_Time - Start_Time);
          Start_Time   := Stop_Time;
          Lp_Result    := Dispatch_Message (Message);
          Has_Msg      := Get_Message (Message, System.Null_Address, 0, 0);
          Manager.all.Update;
-      
+         -- Game system calls
          if not Started then
             Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
             Draw_String(Buffer.all,255,166,0,0,"PRESS ANY KEY",(255,255,255,255),Width,Height);
             Draw_Buffer (Buffer.all'Address);
-            UserInput.Execute (To_Duration (Elapsed_Time), Manager);
+            UserInput.Execute (Elapsed_Time, Manager);
          elsif GameOver then
             Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
             Draw_String(Buffer.all,280,166,0,0,"GAMEOVER",(255,255,255,255),Width,Height);
             Draw_Buffer (Buffer.all'Address);
          else
-            UserInput.Execute (To_Duration (Elapsed_Time), Manager);
-            EnemySpawner.Execute (To_Duration(Elapsed_Time), Manager);
-            Collision.Execute (To_Duration (Elapsed_Time), Manager);
-            Mover.Execute (To_Duration (Elapsed_Time), Manager);
+            UserInput.Execute (Elapsed_Time, Manager);
+            EnemySpawner.Execute (Elapsed_Time, Manager);
+            Collision.Execute (Elapsed_Time, Manager);
+            Mover.Execute (Elapsed_Time, Manager);
             Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
             Draw_String(Buffer.all,1,7,0,0,"SCORE:" & Integer'Image(Score),(255,255,255,255),Width,Height);
-            Render.Execute (To_Duration (Elapsed_Time), Manager);
+            Render.Execute (Elapsed_Time, Manager);
             Draw_Buffer (Buffer.all'Address);
          end if;
       end loop;
