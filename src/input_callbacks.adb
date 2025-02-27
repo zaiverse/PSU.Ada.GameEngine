@@ -136,7 +136,7 @@ package body Input_Callbacks is
 
 
    procedure Space_Key (Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
-      Cooldown   : constant Duration := 0.05;
+      Cooldown   : constant Duration := 0.0;
    begin
       if KeyDown then
          Last_Fired := Last_Fired + Dt;

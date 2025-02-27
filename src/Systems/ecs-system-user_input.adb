@@ -18,6 +18,10 @@ package body ECS.System.User_Input is
             if Key_Callbacks(Integer(Event.Data.KeyCode)) /= null then
                Key_Callbacks(Integer(Event.Data.KeyCode)).all(Manager, Dt, True);
             end if;
+            -- This variable can be used in the main game loop to present a start menu. Currently any key pressed will start the game.
+            if not Started then
+               Started := True;
+            end if;
    
          when ECS.Event.KeyUp =>
             if Key_Callbacks(Integer(Event.Data.KeyCode)) /= null then

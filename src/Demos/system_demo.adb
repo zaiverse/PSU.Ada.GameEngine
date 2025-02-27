@@ -1,5 +1,6 @@
 with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with ECS.System.Enemy_Spawner;
 with Window;                use Window;
 with Win32;                 use Win32;
 with System;
@@ -15,6 +16,7 @@ with ecs.System.Movement;   use ecs.System.Movement;
 with ecs.System.Collision;  use ecs.System.Collision;
 with ecs.System.Render;     use ecs.System.Render;
 with ecs.System.User_Input; use ecs.System.User_Input;
+with ECS.System.Enemy_Spawner; use ECS.System.Enemy_Spawner;
 with Graphics.Texture_Loader; use Graphics.Texture_Loader;
 
 with Input_Callbacks; use Input_Callbacks;
@@ -32,7 +34,7 @@ with GNAT.OS_Lib;
 with System;                  use System;
 with System.Storage_Elements; use System.Storage_Elements;
 
-procedure ECS_Component_Texture_Test is
+procedure System_Demo is
 
 
   package IC renames Interfaces.C;
@@ -61,6 +63,7 @@ procedure ECS_Component_Texture_Test is
   Collision          : Collision_T      := (Width, Height);
   Render             : Render_T         := (Width, Height, Buffer);
   UserInput          : User_Input_T     := (Player, Event_Mgr, False, True);
+  EnemySpawner       : Enemy_Spawn_T;
 
 
 -- Player components
@@ -137,7 +140,6 @@ begin
         Texture_P := new Texture_T'
       (Width => Integer(Texture_Image.Desc.Width), Height => Integer(Texture_Image.Desc.Height), Data => Texture_Image.Data);
 
-      Put_Line("Character width: " & Texture_Image.Desc.Width'Image & " Character height: " & Texture_Image.Desc.Height'Image);
     
     Player.all.Add_Component (Texture_P);
 
@@ -147,16 +149,30 @@ begin
       Start_Time   := Stop_Time;
       Lp_Result    := Dispatch_Message (Message);
       Has_Msg      := Get_Message (Message, System.Null_Address, 0, 0);
-      -- Process emitted events here - for debug purposes
       Manager.all.Update;
-      --Clear_Screen (Buffer.all, Graphics.Color.Blue, Width, Height);
-      Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
-      UserInput.Execute (To_Duration (Elapsed_Time), Manager);
-      Collision.Execute (To_Duration (Elapsed_Time), Manager);
-      Mover.Execute (To_Duration (Elapsed_Time), Manager);
-      Render.Execute (To_Duration (Elapsed_Time), Manager);
-      Draw_Buffer (Buffer.all'Address);
+      
+   
+
+      if not Started then
+         Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+         Draw_String(Buffer.all,255,166,0,0,"PRESS ANY KEY",(255,255,255,255),Width,Height);
+         Draw_Buffer (Buffer.all'Address);
+         UserInput.Execute (To_Duration (Elapsed_Time), Manager);
+      elsif GameOver then
+         Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+         Draw_String(Buffer.all,280,166,0,0,"GAMEOVER",(255,255,255,255),Width,Height);
+         Draw_Buffer (Buffer.all'Address);
+      else
+         UserInput.Execute (To_Duration (Elapsed_Time), Manager);
+         EnemySpawner.Execute (To_Duration(Elapsed_Time), Manager);
+         Collision.Execute (To_Duration (Elapsed_Time), Manager);
+         Mover.Execute (To_Duration (Elapsed_Time), Manager);
+         Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+         Draw_String(Buffer.all,1,7,0,0,"SCORE:" & Integer'Image(Score),(255,255,255,255),Width,Height);
+         Render.Execute (To_Duration (Elapsed_Time), Manager);
+         Draw_Buffer (Buffer.all'Address);
+      end if;
     end loop;
 
   end;
-end ECS_Component_Texture_Test;
+end System_Demo;

@@ -30,7 +30,7 @@ package body ECS.System.Render is
                   Tx renames Texture_T(Texture.all);
                begin
                   --  Put_Line("Drawing texture at " & Integer'Image(Integer(T.Position.X)) & " " & Integer'Image(Integer(T.Position.Y)));
-                  Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X) + 1, Integer(T.Position.Y) + 1, Tx.Width, Tx.Height, Self.Width, Self.Height);
+                  Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Tx.Width, Tx.Height, Self.Width, Self.Height);
                end;
             elsif Trans /= null and Quad /= null then
                declare
