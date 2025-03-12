@@ -134,9 +134,9 @@ procedure ECS_Component_Texture_Transparency_Test is
   TextBuffer : Ada.Streams.Stream_Element_Array (1 .. 200);
   Last       : Ada.Streams.Stream_Element_Offset;
   Red_Ball_File_Name  : constant String :=
-   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\terrace_360.qoi";
+   "C:\Users\zai\PSU.Ada.GameEngine\Data\terrace_360.qoi";
   Green_Ball_File_Name  : constant String :=
-   "D:\Hold\SWENG480\PSU.Ada.GameEngine.Clean\Data\char.qoi";
+   "C:\Users\zai\PSU.Ada.GameEngine\Data\char.qoi";
 
   -- from the example in the QOI package
   -- https://github.com/Fabien-Chouteau/qoi-spark/blob/main/tests/src/tests.adb

@@ -5,6 +5,7 @@ with ECS.Entity; use ECS.Entity;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 with ECS.Component; use ECS.Component;
 with ECS.Vec2; use ECS.Vec2;
+with Graphics.Color; use Graphics.Color;
 
 package ECS.Config_Loader is
 
