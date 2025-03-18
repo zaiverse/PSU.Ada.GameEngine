@@ -1,3 +1,4 @@
+with Ada.Unchecked_Deallocation;
 with ECS.Component; use ECS.Component;
 with ECS.Entity; use ECS.Entity;
 with Ada.Tags; use Ada.Tags;
@@ -19,6 +20,6 @@ package ECS.System is
 
    type System_Access is access all System_T'Class;
 
-
+   procedure Free_System is new Ada.Unchecked_Deallocation(System_T'Class, System_Access);
 
 end ECS.System; 

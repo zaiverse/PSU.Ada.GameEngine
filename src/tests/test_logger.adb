@@ -22,4 +22,18 @@ package body Test_Logger is
          Put_Line("   Actual  : " & Actual);
       end if;
    end Log_Test;
+
+
+   function Center_Text (Text : String; Width : Natural) return String is
+      Total_Dashes : Natural := Width - Text'Length;
+      Left_Dashes : Natural := Total_Dashes / 2;
+      Right_Dashes : Natural := Total_Dashes - Left_Dashes;
+   begin
+      if Width < Text'Length then
+         return Text;
+      else
+         return (1 .. Left_Dashes => '-') & Text & (1 .. Right_Dashes => '-');
+      end if;
+   end Center_Text;
+
 end Test_Logger;

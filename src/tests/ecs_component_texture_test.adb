@@ -150,7 +150,7 @@ begin
       -- Process emitted events here - for debug purposes
       Manager.all.Update;
       --Clear_Screen (Buffer.all, Graphics.Color.Blue, Width, Height);
-      Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+      Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height),0,0, Width, Height, Natural(Background_Image.Desc.Width));
       UserInput.Execute (To_Duration (Elapsed_Time), Manager);
       Collision.Execute (To_Duration (Elapsed_Time), Manager);
       Mover.Execute (To_Duration (Elapsed_Time), Manager);

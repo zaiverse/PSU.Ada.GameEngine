@@ -14,5 +14,5 @@ package Graphics.Color is
    Blue   : constant Color := (R => 0,   G => 0,   B => 255, A => 255);
    White  : constant Color := (R => 255, G => 255, B => 255, A => 255);
    Black  : constant Color := (R => 0,   G => 0,   B => 0,   A => 255);
-   
+   Invisible_Black : constant Color := (0,0,0,0);
 end Graphics.Color;

@@ -1,12 +1,13 @@
 with Graphics.Texture_Loader; use Graphics.Texture_Loader;
 with Ada.Streams;           
 with Ada.Streams.Stream_IO;
-with ECS.Vec2; use ECS.Vec2; 
+with ECS.Vec2; use ECS.Vec2;
+
 package body ECS.System.Enemy_Spawner is 
 
    Last_Spawned   : Duration;
    Cooldown   : constant Duration := 2.0;
-   Enemy_Texture : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\Zombie.qoi";
+   Enemy_Texture : constant String := "Data\Zombie.qoi";
    Texture_Image : QOI_Image_Data := Load_QOI(Enemy_Texture);
    type Vec2_Array is array (0 .. 4) of ECS.Vec2.Vec2;
    Pos_Index : Natural := 0;
@@ -22,6 +23,8 @@ package body ECS.System.Enemy_Spawner is
       E_Quad      : Component_Access;
       
    begin
+      
+      
       Texture_E := new Texture_T'
          (Width => Integer(Texture_Image.Desc.Width), Height => Integer(Texture_Image.Desc.Height), Data => Texture_Image.Data);
       Enemy : Entity_Access := Manager.all.AddEntity ("Enemy");

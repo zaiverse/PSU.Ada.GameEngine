@@ -12,6 +12,7 @@ package body ECS.System.Render is
             Quad        : Component_Access   :=    Entity.all.Get_Component(Quad_T'Tag);
             Text        : Component_Access   :=    Entity.all.Get_Component(Text_T'Tag);
             Texture     : Component_Access   :=    Entity.all.Get_Component(Texture_T'Tag);
+            Animation   : Component_Access   :=    Entity.all.Get_Component(Animation_Component_T'Tag);
          begin
             if Trans = null and Circle = null and Quad = null then
                Put_Line("Entity missing essential components");
@@ -24,13 +25,17 @@ package body ECS.System.Render is
                begin
                   Draw_Regular_Polygon(Self.Buffer.all, C.Sides, C.Radius, T.Position.X,T.Position.Y, C.C, Self.Width, Self.Height);
                end;
-            elsif Trans /= null and Texture /= null then
+            elsif Trans /= null and Texture /= null and Animation /= null then
                declare
                   T renames Transform_T(Trans.all);
                   Tx renames Texture_T(Texture.all);
+                  A renames Animation_Component_T(Animation.all);
+                  Q renames Quad_T(Quad.all);
                begin
-                  --  Put_Line("Drawing texture at " & Integer'Image(Integer(T.Position.X)) & " " & Integer'Image(Integer(T.Position.Y)));
-                  Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Tx.Width, Tx.Height, Self.Width, Self.Height);
+                  --  if Entity.all.Id = "Playr" then
+                  --     Put_Line ("Current X,Y:"& Integer'Image(A.CurX) &":"& Integer'Image(A.CurY) & " Frame:"&Integer'Image(A.CurFrame));
+                  --  end if;
+                  Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Integer(Q.Width), Integer(Q.Height), A.CurX,A.CurY, Self.Width, Self.Height,Natural(Tx.Width));
                end;
             elsif Trans /= null and Quad /= null then
                declare

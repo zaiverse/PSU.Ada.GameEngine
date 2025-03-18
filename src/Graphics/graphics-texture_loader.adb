@@ -1,5 +1,4 @@
 with Ada.Text_IO;   use Ada.Text_IO;
-
 with QOI; use QOI;
 with GNAT.OS_Lib;
 
@@ -18,7 +17,6 @@ package body Graphics.Texture_Loader is
 
     Result : QOI_Image_Data;
   begin
-
    Put_Line("Loading QOI file: " & Filename);
 
     FD := GNAT.OS_Lib.Open_Read (Filename, Binary);

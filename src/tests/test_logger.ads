@@ -6,4 +6,5 @@ package Test_Logger is
        Expected  : String;
        Actual    : String);
 
+   function Center_Text (Text : String; Width : Natural) return String;
 end Test_Logger;

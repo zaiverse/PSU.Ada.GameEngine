@@ -1,17 +1,19 @@
 -- Ada Libraries
 with Ada.Real_Time;           use Ada.Real_Time;
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
+with Ada.Text_IO;             use Ada.Text_IO;
 with Interfaces.C;
 with System;
 -- Game Engine ECS modules
 with ECS.Component;           use ECS.Component;
-with ECS.System.Enemy_Spawner;use ECS.System.Enemy_Spawner;
 with ECS.Entity;              use ECS.Entity;
 with ECS.Entity_Manager;      use ECS.Entity_Manager;
 with ECS.Event;               use ECS.Event;
 with ECS.Event_Manager;       use ECS.Event_Manager;
 with ECS.System;              use ECS.System;
+with ECS.System.Animation;    use ECS.System.Animation;
 with ECS.System.Collision;    use ECS.System.Collision;
+with ECS.System.Enemy_Spawner;use ECS.System.Enemy_Spawner;
 with ECS.System.Movement;     use ECS.System.Movement;
 with ECS.System.Render;       use ECS.System.Render;
 with ECS.System.User_Input;   use ECS.System.User_Input;
@@ -46,6 +48,7 @@ procedure System_Demo is
    Render             : Render_T         := (Width, Height, Buffer);
    UserInput          : User_Input_T     := (Player, Event_Mgr, False, True);
    EnemySpawner       : Enemy_Spawn_T;
+   Animation          : Animation_T;
    -- Player components
    Transform_P : Component_Access := new Transform_T'(Position => (X => 50.0, Y => 150.0), Velocity => (X => 0.0, Y => 0.0), Rotation => 0.0);
    T_P : Transform_T renames Transform_T(Transform_P.all);
@@ -64,13 +67,15 @@ procedure System_Demo is
    C_P         : Collision_Params_T renames Collision_Params_T(Collision_Params_P.all);
    Shape_P     : Component_Access := new Quad_T'(
       Width => 36.0,
-      Height => 54.0,
-      C => (R=> 255, G => 255, B => 0, A => 255)
+      Height => 53.0,
+      C => (R=> 0, G => 0, B => 0, A => 255)
    );
 
+   Animation_P : Component_Access := new Animation_Component_T'(80,0,0.1,0.0,14,27,14,27,0,8);
+
    Texture_P : Component_Access;
-   bkgrd  : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\terrace_360.qoi";
-   player_texture : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\char.qoi";
+   bkgrd  : constant String := "Data\terrace_360.qoi";
+   player_texture : constant String := "Data\Walk-S.qoi";
 begin
    -- Define input keys
    Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
@@ -84,6 +89,7 @@ begin
    Player.all.Add_Component (AABB_P);
    Player.all.Add_Component (Collision_Params_P);
    Player.all.Add_Component (Shape_P);
+   Player.all.Add_Component (Animation_P);
    -- Used to calculate the frame time
    Start_Time := Clock;
    Stop_Time  := Clock;
@@ -110,22 +116,23 @@ begin
          Manager.all.Update;
          -- Game system calls
          if not Started then
-            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), 0,0, Width, Height,Natural(Background_Image.Desc.Width));
             Draw_String(Buffer.all,255,166,0,0,"PRESS ANY KEY",(255,255,255,255),Width,Height);
             Draw_Buffer (Buffer.all'Address);
             UserInput.Execute (Elapsed_Time, Manager);
          elsif GameOver then
-            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), 0,0, Width, Height, Natural(Background_Image.Desc.Width));
             Draw_String(Buffer.all,280,166,0,0,"GAMEOVER",(255,255,255,255),Width,Height);
             Draw_Buffer (Buffer.all'Address);
          else
             UserInput.Execute (Elapsed_Time, Manager);
-            EnemySpawner.Execute (Elapsed_Time, Manager);
+            --EnemySpawner.Execute (Elapsed_Time, Manager);
             Collision.Execute (Elapsed_Time, Manager);
             Mover.Execute (Elapsed_Time, Manager);
-            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), Width, Height);
+            Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), 0,0, Width, Height,Natural(Background_Image.Desc.Width));
             Draw_String(Buffer.all,1,7,0,0,"SCORE:" & Integer'Image(Score),(255,255,255,255),Width,Height);
             Render.Execute (Elapsed_Time, Manager);
+            Animation.Execute(Elapsed_Time, Manager);
             Draw_Buffer (Buffer.all'Address);
          end if;
       end loop;
