@@ -1,6 +1,8 @@
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 package Input_Callbacks is
 
+
+
 procedure Space_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown : Boolean);
 procedure W_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown : Boolean);
 procedure A_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown : Boolean);

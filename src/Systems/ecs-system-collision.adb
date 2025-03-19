@@ -65,6 +65,14 @@ package body ECS.System.Collision is
                         -- Flag the entity to be removed if set to be destroyed on collision
                         E_1.all.Destroyed := E1_CP.Destroy_On_Collision;
                         E_2.all.Destroyed := E2_CP.Destroy_On_Collision;
+                        if (E_1.all.Id = "B0001" and E_2.all.id = "Enemy") or
+                           (E_1.all.Id = "Enemy" and E_2.all.id = "B0001") then
+                           Score := Score + 10;
+                        end if;
+
+                        if (E_1.all.Id = "Playr" or E_2.all.id = "Playr") then
+                           GameOver := True;
+                        end if;
                      end if;
                   else
                      E1_CP.Collision_Occurred := False;

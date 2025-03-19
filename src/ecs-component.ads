@@ -1,4 +1,5 @@
 with Ada.Tags; use Ada.Tags;
+with Ada.Unchecked_Deallocation;
 with ECS.Vec2;
 with Graphics.Color; use Graphics.Color;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -9,6 +10,7 @@ package ECS.Component is
    type Component_T is tagged null record;
    type Component_Access is access all Component_T'Class;
    type Components_T is array (Natural range <>) of Component_Access;
+   procedure Free_Component is new Ada.Unchecked_Deallocation(Component_T'Class, Component_Access);
 
    type Transform_T is new Component_T with record
       Position : ECS.Vec2.Vec2;
@@ -54,7 +56,20 @@ package ECS.Component is
    type Texture_T is new Component_T with record
       Width    : Integer;
       Height   : Integer;
-      Data : Storage_Array_Access;
+      Data     : Storage_Array_Access;
+   end record;
+
+   type Animation_Component_T is new Component_T with record
+      OffsetX     : Integer   := 0;
+      OffsetY     : Integer   := 0;   
+      Time        : Duration  := 0.0;
+      Total_Time  : Duration  := 0.0;
+      InitialX    : Integer   := 0;
+      InitialY    : Integer   := 0;
+      CurX        : Integer   := 0;
+      CurY        : Integer   := 0;
+      CurFrame    : Integer   := 0;
+      TotFrame    : Integer   := 0;
    end record;
 
 end ECS.Component;

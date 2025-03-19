@@ -12,4 +12,6 @@ package ECS.System.Collision is
                        Dt   : Duration;
                        Manager    : access Entity_Manager_T'Class );
 
+   Score : Integer := 0;
+   GameOver : Boolean := False;
 end ECS.System.Collision;

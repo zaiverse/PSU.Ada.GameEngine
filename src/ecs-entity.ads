@@ -1,7 +1,7 @@
-with ecs.component; use ecs.component;
+with ECS.Component; use ECS.Component;
 with Ada.Tags; use Ada.Tags;
 with Ada.Containers.Vectors;
-
+with Ada.Unchecked_Deallocation;
 
 package ecs.entity is 
 
@@ -19,4 +19,6 @@ package ecs.entity is
 
     function Get_Component (E : Entity_T'Class; Tag : Ada.Tags.Tag) return Component_Access;
     procedure Add_Component(E: in out Entity_T'Class; Component: Component_Access);
+    procedure Free_Entity is new Ada.Unchecked_Deallocation(Entity_T'Class, Entity_Access);
+    procedure Free_Components(E : in out Entity_T'Class);
 end ecs.entity;

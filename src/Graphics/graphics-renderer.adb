@@ -41,6 +41,17 @@ package body Graphics.Renderer is
       Img(Index + 3) := Byte(C.A);
    end set_pixel_color;
 
+   function Get_Pixel_Color (img : in out Byte_Array; x,y : Integer; Screen_Width, Screen_Height : Natural) return Graphics.Color.Color is
+      Index : Natural := ((y mod Screen_Height) * Screen_Width + (x mod Screen_Width) ) * 4;
+      C : Graphics.Color.Color;
+   begin
+      C.B := Graphics.Color.Color_Int(Img(Index));
+      C.G := Graphics.Color.Color_Int(Img(Index + 1));
+      C.R := Graphics.Color.Color_Int(Img(Index + 2));
+      C.A := Graphics.Color.Color_Int(Img(Index + 3));
+      return C;
+   end Get_Pixel_Color;
+
    procedure Clear_Screen ( img : in out Byte_Array; C : Graphics.Color.Color; Screen_Width, Screen_Height : Natural) is
    begin
       for Y in 0 .. Screen_Height - 1 loop
@@ -291,7 +302,7 @@ begin
    end loop;
 end Draw_String;
 
-   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height : Integer; Screen_Width, Screen_Height : Natural) is
+   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height,StartX,StartY : Integer; Screen_Width, Screen_Height,Image_Width : Natural) is
 
       function Blend_Color_Values (A, B, Alpha : Float) return Float is
       begin
@@ -304,7 +315,7 @@ end Draw_String;
          begin
             for J in 0 .. (Width - 1) loop
                declare
-                  Img_Index : Natural := (I * Width + J) * 4 + 1;
+                  Img_Index : Natural := ((StartY + I) * Image_Width + (StartX + J)) * 4 + 1;
                   -- need to offset the buffer index by the x and y values            
                   Buffer_Index : Natural := ((Y mod Screen_Height + I) * Screen_Width + (X mod Screen_Width + J) ) * 4;
 
