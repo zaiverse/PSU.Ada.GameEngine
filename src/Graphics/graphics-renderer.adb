@@ -295,14 +295,69 @@ procedure Draw_String(
    is
    StartX   : Integer := X;
    StartY   : Integer := Y;
-   Char     : Character;        
+   Char     : Character;
+   Char_Spacing : constant Natural := 10;        
 begin
    for I in 1 .. S'Length loop
       Char := S(I);
       Draw_Character (img, StartX, StartY, Width, Height, Char, Color, Screen_Width, Screen_Height);
-      StartX := StartX + 10; -- Temporary magic number until size scaling is in place
+      StartX := StartX + Char_Spacing; 
    end loop;
 end Draw_String;
+
+
+   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height : Integer; Screen_Width, Screen_Height : Natural) is
+
+      function Blend_Color_Values (A, B, Alpha : Float) return Float is
+      begin
+         return A * Alpha + B * (1.0 - Alpha);
+      end Blend_Color_Values;
+
+   begin
+
+      for I in 0 .. (Height - 1) loop
+         begin
+            for J in 0 .. (Width - 1) loop
+               declare
+                  Img_Index : Natural := (I * Width + J) * 4 + 1;
+                  -- need to offset the buffer index by the x and y values            
+                  Buffer_Index : Natural := ((Y mod Screen_Height + I) * Screen_Width + (X mod Screen_Width + J) ) * 4;
+
+                  New_Red_Value, New_Green_Value, New_Blue_Value, New_Alpha_Value : Float;
+                  Original_Red_Value, Original_Green_Value, Original_Blue_Value : Float;
+                  Blended_Red, Blended_Green, Blended_Blue : Float;
+
+               begin
+                  if X + J < Screen_Width and Y + I < Screen_Height then
+
+                     --  Put_Line("Buffer Index: " & Buffer_Index'Image & " Img Index: " & Img_Index'Image);
+
+                     Original_Red_Value := Float(buffer(Buffer_Index+2));
+                     Original_Green_Value := Float(buffer(Buffer_Index+1));
+                     Original_Blue_Value := Float(buffer(Buffer_Index));
+
+                     New_Red_Value := Float(img.all(Storage_Offset(Img_Index)));
+                     New_Green_Value := Float(img.all(Storage_Offset(Img_Index+1)));
+                     New_Blue_Value := Float(img.all(Storage_Offset(Img_Index+2)));
+                     New_Alpha_Value := Float(img.all(Storage_Offset(Img_Index+3))) / 255.0;
+
+                     Blended_Red := Blend_Color_Values(New_Red_Value, Original_Red_Value, New_Alpha_Value);
+                     Blended_Green := Blend_Color_Values(New_Green_Value, Original_Green_Value, New_Alpha_Value);
+                     Blended_Blue := Blend_Color_Values(New_Blue_Value, Original_Blue_Value, New_Alpha_Value);
+
+                     buffer(Buffer_Index) := Byte(Blended_Blue);
+                     buffer(Buffer_Index+1) := Byte(Blended_Green);
+                     buffer(Buffer_Index+2) := Byte(Blended_Red);
+                     buffer(Buffer_Index+3) := Byte(255); -- The window buffer does not support alpha values
+
+                  end if;
+               end;
+            end loop;
+         end;
+      end loop;
+
+   end Draw_Image_To_Buffer;
+
 
    procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height,StartX,StartY : Integer; Screen_Width, Screen_Height,Image_Width : Natural) is
 
@@ -342,7 +397,7 @@ end Draw_String;
                      Blended_Green  := Blend_Color_Values(New_Green_Value, Original_Green_Value, New_Alpha_Value);
                      Blended_Blue   := Blend_Color_Values(New_Blue_Value, Original_Blue_Value, New_Alpha_Value);
 
-                     
+
             
                      buffer(Buffer_Index)    := Byte(Blended_Blue);
                      buffer(Buffer_Index+1)  := Byte(Blended_Green);
