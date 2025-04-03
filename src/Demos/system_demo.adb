@@ -71,25 +71,44 @@ procedure System_Demo is
       C => (R=> 0, G => 0, B => 0, A => 255)
    );
 
-   Animation_P : Component_Access := new Animation_Component_T'(80,0,0.1,0.0,14,27,14,27,0,8);
+
+   Walk_P : Single_Animation_Access := new Single_Animation_T'(80,0,0.1,0.0,14,27,14,27,0,8);
+
+   Anim_Comp : constant Animation_Component_T := (
+      Animations => (others => null), 
+      Current => Walk
+   );
+
+   Animations_P : Component_Access := new Animation_Component_T'(Anim_Comp);
+
+
 
    Texture_P : Component_Access;
    bkgrd  : constant String := "Data\terrace_360.qoi";
-   player_texture : constant String := "Data\Walk-S.qoi";
+   player_walk : constant String := "Data\Walk-S.qoi";
+   --player_run  : constant String := "Data\Run-S.qoi";
+   player_idle : constant String := "Data\Idle-S.qoi";
 begin
+
+   -- Set animations
+   Anims_P : Animation_Component_T renames Animation_Component_T(Animations_P.all);
+   Anims_P.Animations(Walk) := Walk_P;
+
+
    -- Define input keys
    Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
    Register_Input_Callback (16#57#, W_Key'Access);
    Register_Input_Callback (16#41#, A_Key'Access);
    Register_Input_Callback (16#53#, S_Key'Access);
    Register_Input_Callback (16#44#, D_Key'Access);
+
    -- Add entity components
    Player.all.Add_Component (Transform_P);
    Player.all.Add_Component (Rigidbody_P);
    Player.all.Add_Component (AABB_P);
    Player.all.Add_Component (Collision_Params_P);
    Player.all.Add_Component (Shape_P);
-   Player.all.Add_Component (Animation_P);
+   Player.all.Add_Component (Animations_P);
    -- Used to calculate the frame time
    Start_Time := Clock;
    Stop_Time  := Clock;
@@ -103,7 +122,7 @@ begin
    begin
       -- Load textures
       Background_Image    := Load_QOI (bkgrd);
-      Texture_Image       := Load_QOI(player_texture);
+      Texture_Image       := Load_QOI(player_walk);
       Texture_P           := new Texture_T'(Integer(Texture_Image.Desc.Width),Integer(Texture_Image.Desc.Height),Texture_Image.Data);
       Player.all.Add_Component (Texture_P);
       -- Windows message loop (game loop)
