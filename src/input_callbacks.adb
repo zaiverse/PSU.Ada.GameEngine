@@ -150,7 +150,8 @@ package body Input_Callbacks is
    end Space_Key;
 
    procedure W_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
-   Trans : Component_Access;
+      Trans : Component_Access;
+      Animation : Component_Access;
       Player_Entity : Entity_Access;
    begin
       Player_Entity := Manager.GetEntity("Playr");
@@ -159,19 +160,24 @@ package body Input_Callbacks is
          return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
+      Animation := Player_Entity.all.Get_Component (Animation_Component_T'Tag);
       declare
          T renames Transform_T(Trans.all);
+         A renames Animation_Component_T(Animation.all);
       begin
          if KeyDown then
-            T.Velocity.Y := -200.0;
+            T.Velocity.Y := -100.0;
+            A.Current := Walk;
          else
             T.Velocity.Y := 0.0;
+            A.Current := Idle;
          end if;
       end; 
    end W_Key;
 
    procedure A_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Animation : Component_Access;
       Player_Entity : Entity_Access;
    begin
       Player_Entity := Manager.GetEntity("Playr");
@@ -180,19 +186,24 @@ package body Input_Callbacks is
          return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
+      Animation := Player_Entity.all.Get_Component (Animation_Component_T'Tag);
       declare
          T renames Transform_T(Trans.all);
+         A renames Animation_Component_T(Animation.all);
       begin
          if KeyDown then
-            T.Velocity.X := -200.0;
+            T.Velocity.X := -100.0;
+            A.Current := Walk;
          else
             T.Velocity.X := 0.0;
+            A.Current := Idle;
          end if;
       end; 
    end A_Key;
 
    procedure S_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Animation : Component_Access;
       Player_Entity : Entity_Access;
    begin
       Player_Entity := Manager.GetEntity("Playr");
@@ -201,19 +212,24 @@ package body Input_Callbacks is
          return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
+      Animation := Player_Entity.all.Get_Component (Animation_Component_T'Tag);
       declare
          T renames Transform_T(Trans.all);
+         A renames Animation_Component_T(Animation.all);
       begin
          if KeyDown then
-            T.Velocity.Y := 200.0;
+            T.Velocity.Y := 100.0;
+            A.Current := Walk;
          else
             T.Velocity.Y := 0.0;
+            A.Current := Idle;
          end if;
       end; 
    end S_Key;   
 
    procedure D_Key(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
       Trans : Component_Access;
+      Animation : Component_Access;
       Player_Entity : Entity_Access;
    begin
       Player_Entity := Manager.GetEntity("Playr");
@@ -222,13 +238,17 @@ package body Input_Callbacks is
          return;
       end if;
       Trans := Player_Entity.all.Get_Component (Transform_T'Tag);
+      Animation := Player_Entity.all.Get_Component (Animation_Component_T'Tag);
       declare
          T renames Transform_T(Trans.all);
+         A renames Animation_Component_T(Animation.all);
       begin
          if KeyDown then
-            T.Velocity.X := 200.0;
+            T.Velocity.X := 100.0;
+            A.Current := Walk;
          else
             T.Velocity.X := 0.0;
+            A.Current := Idle;
          end if;
       end; 
    end D_Key;

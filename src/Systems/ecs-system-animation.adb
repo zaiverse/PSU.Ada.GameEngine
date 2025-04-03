@@ -1,3 +1,4 @@
+with Ada.Text_IO;             use Ada.Text_IO;
 package body ECS.System.Animation is 
    procedure Execute ( Self : in out Animation_T;
                        Dt   : Duration;
@@ -9,7 +10,9 @@ package body ECS.System.Animation is
       begin
          if Animation /= null then
             declare
-               A renames Animation_Component_T(Animation.all); 
+               As renames Animation_Component_T(Animation.all);
+               A : Single_Animation_Access := As.Animations(As.Current);
+
             begin
                if A.Total_Time >=  A.Time then
                   A.CurX := A.CurX + A.OffsetX;
