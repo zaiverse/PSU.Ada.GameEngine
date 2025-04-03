@@ -73,17 +73,20 @@ procedure System_Demo is
 
 
    Walk_P : Single_Animation_Access := new Single_Animation_T'(80,0,0.1,0.0,14,27,14,27,0,8);
+   Idle_P : Single_Animation_Access := new Single_Animation_T'(80,0,0.1,0.0,21,27,21,27,0,6);
 
    Anim_Comp : constant Animation_Component_T := (
       Animations => (others => null), 
-      Current => Walk
+      Textures => (others => null),
+      Current => Idle
    );
 
    Animations_P : Component_Access := new Animation_Component_T'(Anim_Comp);
 
 
 
-   Texture_P : Component_Access;
+   Walk_Texture_P : Texture_Access;
+   Idle_Texture_P : Texture_Access;
    bkgrd  : constant String := "Data\terrace_360.qoi";
    player_walk : constant String := "Data\Walk-S.qoi";
    --player_run  : constant String := "Data\Run-S.qoi";
@@ -93,6 +96,7 @@ begin
    -- Set animations
    Anims_P : Animation_Component_T renames Animation_Component_T(Animations_P.all);
    Anims_P.Animations(Walk) := Walk_P;
+   Anims_P.Animations(Idle) := Idle_P;
 
 
    -- Define input keys
@@ -121,10 +125,15 @@ begin
       Background_Image  : QOI_Image_Data;
    begin
       -- Load textures
-      Background_Image    := Load_QOI (bkgrd);
-      Texture_Image       := Load_QOI(player_walk);
-      Texture_P           := new Texture_T'(Integer(Texture_Image.Desc.Width),Integer(Texture_Image.Desc.Height),Texture_Image.Data);
-      Player.all.Add_Component (Texture_P);
+      Background_Image     := Load_QOI (bkgrd);
+      Texture_Image        := Load_QOI(player_walk);
+      Walk_Texture_P       := new Texture_T'(Integer(Texture_Image.Desc.Width),Integer(Texture_Image.Desc.Height),Texture_Image.Data);
+      Texture_Image        := Load_QOI(player_idle);
+      Idle_Texture_P       := new Texture_T'(Integer(Texture_Image.Desc.Width),Integer(Texture_Image.Desc.Height),Texture_Image.Data);
+
+      Anims_P.Textures(Walk) := Walk_Texture_P;
+      Anims_P.Textures(Idle) := Idle_Texture_P;
+
       -- Windows message loop (game loop)
       while Has_Msg loop
          Stop_Time    := Clock;

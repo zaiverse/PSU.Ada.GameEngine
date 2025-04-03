@@ -9,39 +9,39 @@ package body ECS.System.Render is
    begin
       Draw_Regular_Polygon(Self.Buffer.all, C.Sides, C.Radius, T.Position.X,T.Position.Y, C.C, Self.Width, Self.Height);
    end Draw_Circle;
-
-   procedure Draw_Texture(Self : in out Render_T; Transform, Texture, Animation, Quad : Component_Access) is
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+   procedure Draw_Animated_Texture(Self : in out Render_T; Transform, Animation, Quad : Component_Access) is
       T renames Transform_T(Transform.all);
-      Tx renames Texture_T(Texture.all);
       Q renames Quad_T(Quad.all);
+      AC renames Animation_Component_T(Animation.all);
+      A : Single_Animation_Access := AC.Animations(AC.Current);
+      Tx : Texture_Access := AC.Textures(AC.Current);
    begin
-      if Animation /= null then
-      declare
-         As renames Animation_Component_T(Animation.all);
-         A : Single_Animation_Access := As.Animations(As.Current); 
-
-      begin
-         Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Integer(Q.Width), Integer(Q.Height), A.CurX,A.CurY, Self.Width, Self.Height,Natural(Tx.Width));
-      end;
-      else
-         Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Tx.Width, Tx.Height, Self.Width, Self.Height);
-      end if;
-   end Draw_Texture;
-
+      Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Integer(Q.Width), Integer(Q.Height), A.CurX,A.CurY, Self.Width, Self.Height,Natural(Tx.Width));
+   end Draw_Animated_Texture;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+   procedure Draw_Static_Texture(Self : in out Render_T; Transform, Texture, Quad : Component_Access) is
+      T renames Transform_T(Transform.all);
+      Q renames Quad_T(Quad.all);
+      Tx renames Texture_T(Texture.all);
+   begin
+      Draw_Image_To_Buffer(Self.Buffer.all, Tx.Data, Integer(T.Position.X), Integer(T.Position.Y), Tx.Width, Tx.Height, Self.Width, Self.Height);
+   end Draw_Static_Texture;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
    procedure Draw_Rectangle(Self : in out Render_T; Transform, Quad : Component_Access) is
       T renames Transform_T(Transform.all);
       Q renames Quad_T(Quad.all);
    begin
       Draw_Filled_Quad (Self.Buffer.all,T.Position.X, T.Position.Y, Q.Width, Q.Height, Q.C,Self.Width, Self.Height);
    end Draw_Rectangle;
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
    procedure Draw_Text(Self : in out Render_T; Transform, Text : Component_Access) is
       T renames Transform_T(Transform.all);
       Txt renames Text_T(Text.all);
    begin
       Draw_String (Self.Buffer.all, Integer(T.Position.X), Integer(T.Position.Y), 0, 0, To_String(Txt.Text), Txt.C, Self.Width,Self.Height);
    end Draw_Text;
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
    -- Calls the drawing function for each entity depending on the attached components
    procedure Execute (Self       : in out Render_T;
@@ -63,8 +63,10 @@ package body ECS.System.Render is
                Self.Draw_Circle (Transform, Circle);
             end if;
          if Quad /= null then
-            if Texture /= null then
-               Self.Draw_Texture(Transform, Texture, Animation, Quad);
+            if Animation /= null  then
+               Self.Draw_Animated_Texture (Transform, Animation, Quad);
+            elsif Texture /= null then
+               Self.Draw_Static_Texture(Transform,Texture,Quad);
             else
                Self.Draw_Rectangle(Transform, Quad);
             end if;
