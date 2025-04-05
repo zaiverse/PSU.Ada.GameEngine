@@ -19,8 +19,7 @@ package body Input_Callbacks is
     Desc : QOI.QOI_Desc;
   end record;
 
-
-  icon : constant String := "C:\ProgramData\Ada\PSU.Ada.GameEngine.Fork\Data\skull.qoi";
+  icon : constant String := "Data\skull.qoi";
   Texture_Image : Input_Data2;
 
   function Load_QOI (Filename : String) return Input_Data2 is
@@ -136,11 +135,12 @@ package body Input_Callbacks is
 
 
    procedure Space_Key (Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
-      Cooldown   : constant Duration := 0.02;
+      Cooldown   : constant Duration := 0.0;
    begin
       if KeyDown then
          Last_Fired := Last_Fired + Dt;
          if Last_Fired >= Cooldown then
+
             Spawn_Bullet(Manager);
             Last_Fired := Last_Fired - Cooldown;
          end if;

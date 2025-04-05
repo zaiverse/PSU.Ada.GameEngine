@@ -1,0 +1,29 @@
+with "../psu_ada_gameengine.gpr";
+with "config/demo_config.gpr";
+project Demo is
+
+   -- for Languages use ("ada", "c");
+   for Source_Dirs use ("src/");
+   for Object_Dir use "obj/" & demo_config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Exec_Dir use "bin";
+   for Main use ("demo.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-Og" ,"-gnat2022", "-gnatX0");
+   end Compiler;
+
+   package Linker is 
+      for Switches ("ada") use ("-lgdi32", "-llargeint");
+      for Switches ("c") use ("-lgdi32", "-llargeint");
+   end Linker;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es"); --  Symbolic traceback
+   end Binder;
+
+   package Install is
+      for Artifacts (".") use ("share");
+   end Install;
+
+end Demo;

@@ -1,6 +1,6 @@
 name = "psu_ada_gameengine"
 description = ""
-version = "0.1.0-dev"
+version = "0.1.0"
 
 authors = ["Your Name"]
 maintainers = ["Your Name <example@example.com>"]
