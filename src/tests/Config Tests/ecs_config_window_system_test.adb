@@ -9,16 +9,19 @@ with Graphics.Renderer; use Graphics.Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
 with Graphics.Color; use Graphics.Color;
 with ecs.System.Render; use ecs.System.Render;
-with ECS.System.Movement;     use ECS.System.Movement;
-with ECS.System.Collision;    use ECS.System.Collision;
+with ECS.System.Movement; use ECS.System.Movement;
+with ECS.System.Collision; use ECS.System.Collision;
 
-with System;                  use System;
+with System; use System;
 with System.Storage_Elements; use System.Storage_Elements;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 procedure ECS_Config_Window_System_Test is
    Manager : aliased Entity_Manager_T;
+   Window_Width : Integer;
+   Window_Height : Integer;
+   Window_Color : Graphics.Color.Color;
 
    procedure Print_Entity(Entity : access ECS.Entity.Entity_T'Class) is
       Transform_Comp : constant Component_Access := Entity.Get_Component(Transform_T'Tag);
@@ -81,23 +84,20 @@ procedure ECS_Config_Window_System_Test is
       New_Line;
    end Print_Entity;
 
-   procedure Render_Entities(Manager : access Entity_Manager_T) is
-      Width  : constant Integer := 800;
-      Height : constant Integer := 600;
+   procedure Render_Entities(Manager : access Entity_Manager_T; Window_Width : Integer; Window_Height : Integer; Window_Color : Graphics.Color.Color) is
       Title  : Unbounded_String := To_Unbounded_String("Game Window");
       GameWindow : Window_Access;
-      Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
-      SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
+      Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Window_Width * Window_Height * 4);
       Start_Time, Stop_Time : Time;
       Elapsed_Time : Time_Span;
-      Render : Render_T := (Width, Height, Buffer);
-      Mover : Mover_T := (Width, Height); -- Initialize the Movement system
-      Collider : Collision_T := (Width, Height); -- Initialize the Collision system
+      Render : Render_T := (Window_Width, Window_Height, Buffer);
+      Mover : Mover_T := (Window_Width, Window_Height); -- Initialize the Movement system
+      Collider : Collision_T := (Window_Width, Window_Height); -- Initialize the Collision system
       Has_Msg : Boolean := True;
       Message : MSG_Access := new MSG;
       Lp_Result : LRESULT;
    begin
-      GameWindow := New_Window(IC.int(Width), IC.int(Height), Title);
+      GameWindow := New_Window(IC.int(Window_Width), IC.int(Window_Height), Title);
       Put_Line("Start Engine");
 
       -- Initialize Start_Time before the loop
@@ -110,7 +110,7 @@ procedure ECS_Config_Window_System_Test is
          Lp_Result := Dispatch_Message(Message);
          Has_Msg := Get_Message(Message, System.Null_Address, 0, 0);
 
-            -- Debugging output to check for missing components
+         -- Debugging output to check for missing components
          for Entity of Manager.Entities loop
             if Entity.Get_Component(Transform_T'Tag) = null then
                Put_Line("Entity ID:" & Entity.Id & " is missing Transform component");
@@ -134,7 +134,7 @@ procedure ECS_Config_Window_System_Test is
          Collider.Execute(To_Duration(Elapsed_Time), Manager);
 
          Manager.Update;
-         Clear_Screen(Buffer.all, Graphics.Color.Blue, Width, Height);
+         Clear_Screen(Buffer.all, Window_Color, Window_Width, Window_Height);
          Render.Execute(To_Duration(Elapsed_Time), Manager);
          Draw_Buffer(Buffer.all'Address);
       end loop;
@@ -142,7 +142,7 @@ procedure ECS_Config_Window_System_Test is
 
 begin
    -- Load configuration from INI file
-   Load_Config(Manager, "C:\Users\zai\Documents\SPRING 2025\milestone project\Active Group Git\PSU.Ada.GameEngine\src\tests\Config Tests\entities.ini");
+   Load_Config(Manager, "C:\Users\zai\Documents\SPRING 2025\milestone project\activefork\PSU.Ada.GameEngine\src\tests\Config Tests\entities.ini", Window_Width, Window_Height, Window_Color);
 
    -- Update the manager to process any pending entities
    Manager.Update;
@@ -152,8 +152,7 @@ begin
       Print_Entity(Entity);
    end loop;
 
-
    -- Render the entities to the window
-   Render_Entities(Manager'Access);
+   Render_Entities(Manager'Access, Window_Width, Window_Height, Window_Color);
 
 end ECS_Config_Window_System_Test;
