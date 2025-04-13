@@ -1,3 +1,11 @@
-package ecs is
+with GameMath; use GameMath;
+package ECS is
+   type MousePosition is record
+      PreviousPos : Vec2;
+      CurrentPos : Vec2;
+   end record;
 
-end ecs;
+
+   -- Package level static variables
+   MousePos : MousePosition := ((0.0,0.0),(0.0,0.0));
+end ECS;

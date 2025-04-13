@@ -1,4 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with ecs;
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -252,5 +253,15 @@ package body Input_Callbacks is
          end if;
       end; 
    end D_Key;
+
+   procedure L_Button_Down(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
+   begin
+      Put_Line ("Left mouse pressed at "& ECS.MousePos.CurrentPos'Image);
+   end L_Button_Down;
+
+   procedure L_Button_Up(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown: Boolean) is
+   begin
+      Put_Line ("Left mouse released at "& ECS.MousePos.CurrentPos'Image);
+   end L_Button_Up;
 
 end Input_Callbacks;
