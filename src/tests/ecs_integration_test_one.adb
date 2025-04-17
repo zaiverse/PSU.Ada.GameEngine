@@ -4,7 +4,7 @@ with ECS.System.Collision; use ECS.System.Collision;
 with ECS.Entity; use ECS.Entity;
 with ECS.Entity_Manager; use ECS.Entity_Manager;
 with ECS.Component; use ECS.Component;
-with ECS.Vec2; use ECS.Vec2;
+with GameMath; use GameMath;
 with Test_Logger; use Test_Logger;
 with Ada.Text_IO; use Ada.Text_IO;
 

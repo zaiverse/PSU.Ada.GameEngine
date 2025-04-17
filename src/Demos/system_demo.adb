@@ -5,6 +5,7 @@ with Ada.Text_IO;             use Ada.Text_IO;
 with Interfaces.C;
 with System;
 -- Game Engine ECS modules
+with ECS;                     use ECS;
 with ECS.Component;           use ECS.Component;
 with ECS.Entity;              use ECS.Entity;
 with ECS.Entity_Manager;      use ECS.Entity_Manager;
@@ -17,7 +18,7 @@ with ECS.System.Enemy_Spawner;use ECS.System.Enemy_Spawner;
 with ECS.System.Movement;     use ECS.System.Movement;
 with ECS.System.Render;       use ECS.System.Render;
 with ECS.System.User_Input;   use ECS.System.User_Input;
-with ECS.Vec2;                use ECS.Vec2;
+with GameMath;                use GameMath;
 -- Game Engine Graphics modules
 with Graphics.Color;          use Graphics.Color;
 with Graphics.Renderer;       use Graphics.Renderer;
@@ -100,11 +101,14 @@ begin
 
 
    -- Define input keys
-   Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
-   Register_Input_Callback (16#57#, W_Key'Access);
-   Register_Input_Callback (16#41#, A_Key'Access);
-   Register_Input_Callback (16#53#, S_Key'Access);
-   Register_Input_Callback (16#44#, D_Key'Access);
+   Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+   Register_Key_Callback (16#57#, W_Key'Access);
+   Register_Key_Callback (16#41#, A_Key'Access);
+   Register_Key_Callback (16#53#, S_Key'Access);
+   Register_Key_Callback (16#44#, D_Key'Access);
+
+   Register_Mouse_Callback (16#201#, L_Button_Down'Access);
+   Register_Mouse_Callback (16#202#, L_Button_Up'Access);
 
    -- Add entity components
    Player.all.Add_Component (Transform_P);

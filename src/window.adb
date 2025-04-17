@@ -118,7 +118,7 @@ package body Window is
             MouseY    : Integer := Integer((L_Param_U / 16#10000#) and 16#FFFF#);
          begin
             -- Emit the event only if a mouse button is pressed
-            if (W_Param and (MK_LBUTTON or MK_RBUTTON or MK_MBUTTON)) /= 0 then
+            --if (W_Param and (MK_LBUTTON or MK_RBUTTON or MK_MBUTTON)) /= 0 then
                declare
                   MouseEvent : ECS.Event.Event_T :=
                   (Source    => 0,
@@ -132,7 +132,7 @@ package body Window is
                begin
                   Emit_Event(Manager, MouseEvent);
                end;
-            end if;
+           -- end if;
          end;
          when others =>
             return Def_Window_Proc(H_Wnd, Msg, W_Param, L_Param);

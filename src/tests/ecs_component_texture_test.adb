@@ -9,7 +9,7 @@ with Graphics.Color;        use Graphics.Color;
 with ecs.Entity_Manager;    use ecs.Entity_Manager;
 with ecs.Event;             use ecs.Event;
 with ecs.Event_Manager;     use ecs.Event_Manager;
-with ecs.Vec2;              use ecs.Vec2;
+with GameMath;              use GameMath;
 with ecs.System;            use ecs.System;
 with ecs.System.Movement;   use ecs.System.Movement;
 with ecs.System.Collision;  use ecs.System.Collision;
@@ -102,11 +102,11 @@ Shape_P     : Component_Access := new Quad_T'(
 
 begin
 
-  Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
-  Register_Input_Callback (16#57#, W_Key'Access);
-  Register_Input_Callback (16#41#, A_Key'Access);
-  Register_Input_Callback (16#53#, S_Key'Access);
-  Register_Input_Callback (16#44#, D_Key'Access);
+  Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+  Register_Key_Callback (16#57#, W_Key'Access);
+  Register_Key_Callback (16#41#, A_Key'Access);
+  Register_Key_Callback (16#53#, S_Key'Access);
+  Register_Key_Callback (16#44#, D_Key'Access);
 
   -- Add entity components
   Player.all.Add_Component (Transform_P);
