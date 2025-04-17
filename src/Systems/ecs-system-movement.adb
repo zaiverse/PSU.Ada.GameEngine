@@ -41,7 +41,7 @@ package body ECS.System.Movement is
                B renames AABB_T(AABB.all);
                Q renames Quad_T(Quad.all);
                C renames Collision_Params_T(Collision.all);
-               Velocity_Scaled : ECS.Vec2.Vec2 := New_Vec2(X_In => T.Velocity.X, Y_In => T.Velocity.Y);
+               Velocity_Scaled : GameMath.Vec2 := New_Vec2(X_In => T.Velocity.X, Y_In => T.Velocity.Y);
                begin
                   Scale(Velocity_Scaled, Float(Dt));
                   -- Update the entity position while maintaining the position within screen bounds
