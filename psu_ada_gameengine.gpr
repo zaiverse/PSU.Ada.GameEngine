@@ -4,7 +4,7 @@ project Psu_Ada_Gameengine is
    for Library_Name use "Library_Test";
    for Library_Version use Project'Library_Name & ".so." & psu_ada_gameengine_config.Crate_Version;
 
-   for Languages use ("ada", "c");
+   for Languages use ("ada");
    for Source_Dirs use ("src/**");
    for Object_Dir use "obj/" & Psu_Ada_Gameengine_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
