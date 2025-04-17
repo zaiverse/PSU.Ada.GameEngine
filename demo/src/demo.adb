@@ -13,7 +13,6 @@ with ECS.Event_Manager;       use ECS.Event_Manager;
 with ECS.System;              use ECS.System;
 with ECS.System.Animation;    use ECS.System.Animation;
 with ECS.System.Collision;    use ECS.System.Collision;
-with ECS.System.Enemy_Spawner;use ECS.System.Enemy_Spawner;
 with ECS.System.Movement;     use ECS.System.Movement;
 with ECS.System.Render;       use ECS.System.Render;
 with ECS.System.User_Input;   use ECS.System.User_Input;
@@ -27,6 +26,7 @@ with Win32;                 use Win32;
 with Window;                use Window;
 -- User defined modules
 with Input_Callbacks; use Input_Callbacks;
+with ECS.System.Enemy_Spawner;use ECS.System.Enemy_Spawner;
 
 procedure demo is
    package IC renames Interfaces.C;
@@ -83,8 +83,6 @@ procedure demo is
 
    Animations_P : Component_Access := new Animation_Component_T'(Anim_Comp);
 
-
-
    Walk_Texture_P : Texture_Access;
    Idle_Texture_P : Texture_Access;
    bkgrd  : constant String := "Data\terrace_360.qoi";
@@ -97,7 +95,6 @@ begin
    Anims_P : Animation_Component_T renames Animation_Component_T(Animations_P.all);
    Anims_P.Animations(Walk) := Walk_P;
    Anims_P.Animations(Idle) := Idle_P;
-
 
    -- Define input keys
    Register_Input_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
@@ -154,7 +151,7 @@ begin
             Draw_Buffer (Buffer.all'Address);
          else
             UserInput.Execute (Elapsed_Time, Manager);
-            --EnemySpawner.Execute (Elapsed_Time, Manager);
+            EnemySpawner.Execute (Elapsed_Time, Manager);
             Collision.Execute (Elapsed_Time, Manager);
             Mover.Execute (Elapsed_Time, Manager);
             Draw_Image_To_Buffer (Buffer.all, Background_Image.Data, 0, 0, Integer(Background_Image.Desc.Width), Integer(Background_Image.Desc.Height), 0,0, Width, Height,Natural(Background_Image.Desc.Width));
