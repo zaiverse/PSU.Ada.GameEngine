@@ -2,7 +2,7 @@ with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 with Ada.Text_IO;
 with Ada.Strings.Text_Buffers;
-package body ECS.Vec2 is
+package body GameMath is
 
    procedure My_Put_Image
       (Output : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
@@ -98,4 +98,4 @@ package body ECS.Vec2 is
    begin
       return abs(A - B) <= Epsilon;
    end Nearly_Equals;
-end ECS.Vec2;
+end GameMath;

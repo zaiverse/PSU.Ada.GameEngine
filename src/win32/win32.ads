@@ -42,6 +42,10 @@ package Win32 is
    MK_XBUTTON1 : constant := 32;        -- X1 mouse button (extra button)
    MK_XBUTTON2 : constant := 64;        -- X2 mouse button (extra button)
 
+   
+
+
+
    -- Windowing events -- 
    WM_SIZE : constant := 16#0005#;           -- Sent after a window's size has changed
    WM_SIZING : constant := 16#0214#;         -- Sent while a window is being resized
