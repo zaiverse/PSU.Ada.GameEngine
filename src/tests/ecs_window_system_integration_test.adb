@@ -18,7 +18,7 @@ with ECS.System.Collision; use ECS.System.Collision;
 with ECS.System.Render; use ECS.System.Render;
 with ECS.System.User_Input; use ECS.System.User_Input;
 
---  with Input_Callbacks; use Input_Callbacks;
+with Test_Input_Callbacks; use Test_Input_Callbacks;
 
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;
@@ -102,11 +102,11 @@ Text_Score      : Component_Access := new Text_T'(To_Unbounded_String ("TEST TEX
 
 begin
 
-   --  Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
-   --  Register_Key_Callback (16#57#, W_Key'Access);
-   --  Register_Key_Callback (16#41#, A_Key'Access);
-   --  Register_Key_Callback (16#53#, S_Key'Access);
-   --  Register_Key_Callback (16#44#, D_Key'Access);
+   Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+   Register_Key_Callback (16#57#, W_Key'Access);
+   Register_Key_Callback (16#41#, A_Key'Access);
+   Register_Key_Callback (16#53#, S_Key'Access);
+   Register_Key_Callback (16#44#, D_Key'Access);
       -- Add entity components
    Player.all.Add_Component(Transform_P);
    Player.all.Add_Component(Rigidbody_P);

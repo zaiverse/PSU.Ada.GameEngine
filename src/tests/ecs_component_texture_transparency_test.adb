@@ -16,7 +16,7 @@ with ecs.System.Collision;  use ecs.System.Collision;
 with ecs.System.Render;     use ecs.System.Render;
 with ecs.System.User_Input; use ecs.System.User_Input;
 
---  with Input_Callbacks; use Input_Callbacks;
+with Test_Input_Callbacks; use Test_Input_Callbacks;
 
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
@@ -196,11 +196,11 @@ procedure ECS_Component_Texture_Transparency_Test is
 
 begin
 
---    Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
---    Register_Key_Callback (16#57#, W_Key'Access);
---    Register_Key_Callback (16#41#, A_Key'Access);
---    Register_Key_Callback (16#53#, S_Key'Access);
---    Register_Key_Callback (16#44#, D_Key'Access);
+  Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+  Register_Key_Callback (16#57#, W_Key'Access);
+  Register_Key_Callback (16#41#, A_Key'Access);
+  Register_Key_Callback (16#53#, S_Key'Access);
+  Register_Key_Callback (16#44#, D_Key'Access);
 
   -- Add Static entity components
   Static_Entity.all.Add_Component (Transform_S);

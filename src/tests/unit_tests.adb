@@ -27,7 +27,6 @@ with Graphics.Texture_Loader; use Graphics.Texture_Loader;
 with Win32;                 use Win32;
 with Window;                use Window;
 -- User defined modules
---  with Input_Callbacks; use Input_Callbacks;
 with Test_Logger;           use Test_Logger;
 
 
