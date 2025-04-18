@@ -26,6 +26,8 @@ with System.Secondary_Stack;
 with Win32;                 use Win32;
 with Window;                use Window;
 
+with Input_Callbacks; use Input_Callbacks;
+
 procedure Game is
 
    bkgrd  : constant String := "Data\blue_sky_640x480px.qoi";

@@ -17,7 +17,8 @@ with ecs.System.Render;     use ecs.System.Render;
 with ecs.System.User_Input; use ecs.System.User_Input;
 with Graphics.Texture_Loader; use Graphics.Texture_Loader;
 
-with Input_Callbacks; use Input_Callbacks;
+--  with Input_Callbacks; use Input_Callbacks;
+
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Interfaces;
 with ecs.entity;    use ecs.entity;
@@ -102,11 +103,11 @@ Shape_P     : Component_Access := new Quad_T'(
 
 begin
 
-  Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
-  Register_Key_Callback (16#57#, W_Key'Access);
-  Register_Key_Callback (16#41#, A_Key'Access);
-  Register_Key_Callback (16#53#, S_Key'Access);
-  Register_Key_Callback (16#44#, D_Key'Access);
+--    Register_Key_Callback (16#20#, Space_Key'Access); -- Todo: Add all Key constants to win32.ads file
+--    Register_Key_Callback (16#57#, W_Key'Access);
+--    Register_Key_Callback (16#41#, A_Key'Access);
+--    Register_Key_Callback (16#53#, S_Key'Access);
+--    Register_Key_Callback (16#44#, D_Key'Access);
 
   -- Add entity components
   Player.all.Add_Component (Transform_P);
