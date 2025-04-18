@@ -18,7 +18,7 @@ with ECS.System.Collision; use ECS.System.Collision;
 with ECS.System.Render; use ECS.System.Render;
 with ECS.System.User_Input; use ECS.System.User_Input;
 
-with Input_Callbacks; use Input_Callbacks;
+with Test_Input_Callbacks; use Test_Input_Callbacks;
 
 with ECS.Entity; use ECS.Entity;
 with ECS.Component; use ECS.Component;

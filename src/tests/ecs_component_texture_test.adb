@@ -17,7 +17,8 @@ with ecs.System.Render;     use ecs.System.Render;
 with ecs.System.User_Input; use ecs.System.User_Input;
 with Graphics.Texture_Loader; use Graphics.Texture_Loader;
 
-with Input_Callbacks; use Input_Callbacks;
+with Test_Input_Callbacks; use Test_Input_Callbacks;
+
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Interfaces;
 with ecs.entity;    use ecs.entity;

@@ -16,7 +16,7 @@ with ecs.System.Collision;  use ecs.System.Collision;
 with ecs.System.Render;     use ecs.System.Render;
 with ecs.System.User_Input; use ecs.System.User_Input;
 
-with Input_Callbacks; use Input_Callbacks;
+with Test_Input_Callbacks; use Test_Input_Callbacks;
 
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 

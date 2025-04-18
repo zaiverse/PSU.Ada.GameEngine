@@ -396,8 +396,6 @@ end Draw_String;
                      Blended_Red    := Blend_Color_Values(New_Red_Value, Original_Red_Value, New_Alpha_Value);
                      Blended_Green  := Blend_Color_Values(New_Green_Value, Original_Green_Value, New_Alpha_Value);
                      Blended_Blue   := Blend_Color_Values(New_Blue_Value, Original_Blue_Value, New_Alpha_Value);
-
-
             
                      buffer(Buffer_Index)    := Byte(Blended_Blue);
                      buffer(Buffer_Index+1)  := Byte(Blended_Green);
