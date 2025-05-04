@@ -6,13 +6,16 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Graphics.Renderer; use Graphics.Renderer;
 
 package ECS.Component is 
-
+   
    type Component_T is tagged null record;
    type Component_Access is access all Component_T'Class;
    type Components_T is array (Natural range <>) of Component_Access;
    type Entity_State is (Idle,Walk,Run); 
    
    procedure Free_Component is new Ada.Unchecked_Deallocation(Component_T'Class, Component_Access);
+   
+   -- Used for input system
+   type Player_Tag_Component_T is new Component_T with null record;
 
    type Entity_State_T is new Component_T with record
       State : Entity_State := Idle;

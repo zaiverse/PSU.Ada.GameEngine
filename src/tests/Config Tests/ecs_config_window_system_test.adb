@@ -8,152 +8,85 @@ with Win32; use Win32;
 with Graphics.Renderer; use Graphics.Renderer;
 with Ada.Real_Time; use Ada.Real_Time;
 with Graphics.Color; use Graphics.Color;
+with ECS.Event_Manager; use ECS.Event_Manager;
 with ecs.System.Render; use ecs.System.Render;
-with ECS.System.Movement;     use ECS.System.Movement;
-with ECS.System.Collision;    use ECS.System.Collision;
+with ECS.System.Movement; use ECS.System.Movement;
+with ECS.System.Collision; use ECS.System.Collision;
+with ECS.System.Animation; use ECS.System.Animation;
+with Graphics.Texture_Loader; use Graphics.Texture_Loader;
+with ECS.System.User_Input; use ECS.System.User_Input;
+with ECS.Event; use ECS.Event;
 
-with System;                  use System;
+with System; use System;
 with System.Storage_Elements; use System.Storage_Elements;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 procedure ECS_Config_Window_System_Test is
    Manager : aliased Entity_Manager_T;
+   Window_Width : Integer;
+   Window_Height : Integer;
+   Window_Color : Graphics.Color.Color;
+   User_Input_System : User_Input_T;
 
-   procedure Print_Entity(Entity : access ECS.Entity.Entity_T'Class) is
-      Transform_Comp : constant Component_Access := Entity.Get_Component(Transform_T'Tag);
-      RigidBody_Comp : constant Component_Access := Entity.Get_Component(Rigidbody_T'Tag);
-      AABB_Comp      : constant Component_Access := Entity.Get_Component(AABB_T'Tag);
-      Collision_Comp : constant Component_Access := Entity.Get_Component(Collision_Params_T'Tag);
+   procedure Print_Entity_Info(Entity : ECS.Entity.Entity_Access) is
+      Transform : constant Component_Access := Entity.Get_Component(Transform_T'Tag);
+      Quad      : constant Component_Access := Entity.Get_Component(Quad_T'Tag);
+      Texture   : constant Component_Access := Entity.Get_Component(Texture_T'Tag);
+      Animation : constant Component_Access := Entity.Get_Component(Animation_Component_T'Tag);
    begin
       Put_Line("Entity ID: " & Entity.Id);
-      if Transform_Comp /= null then
-         declare
-            T : Transform_T renames Transform_T(Transform_Comp.all);
-         begin
-            Put_Line("  Transform:");
-            Put_Line("    Position: (" & Float'Image(T.Position.X) & ", " & Float'Image(T.Position.Y) & ")");
-            Put_Line("    Velocity: (" & Float'Image(T.Velocity.X) & ", " & Float'Image(T.Velocity.Y) & ")");
-            Put_Line("    Rotation: " & Float'Image(T.Rotation));
-         end;
+      if Transform /= null then
+         Put_Line("  Transform: Position(" &
+                   Float'Image(Transform_T(Transform.all).Position.X) & ", " &
+                   Float'Image(Transform_T(Transform.all).Position.Y) & "), Velocity(" &
+                   Float'Image(Transform_T(Transform.all).Velocity.X) & ", " &
+                   Float'Image(Transform_T(Transform.all).Velocity.Y) & "), Rotation(" &
+                   Float'Image(Transform_T(Transform.all).Rotation) & ")");
       else
-         Put_Line("  No Transform component");
+         Put_Line("  Transform: Not Initialized");
       end if;
 
-      if RigidBody_Comp /= null then
-         declare
-            R : Rigidbody_T renames Rigidbody_T(RigidBody_Comp.all);
-         begin
-            Put_Line("  RigidBody:");
-            Put_Line("    Mass: " & Float'Image(R.Mass));
-         end;
+      if Quad /= null then
+         Put_Line("  Quad: Width(" & Float'Image(Quad_T(Quad.all).Width) & "), Height(" &
+                   Float'Image(Quad_T(Quad.all).Height) & "), Color(" &
+                   Graphics.Color.Color_Int'Image(Quad_T(Quad.all).C.R) & ", " &
+                   Graphics.Color.Color_Int'Image(Quad_T(Quad.all).C.G) & ", " &
+                   Graphics.Color.Color_Int'Image(Quad_T(Quad.all).C.B) & ", " &
+                   Graphics.Color.Color_Int'Image(Quad_T(Quad.all).C.A) & ")");
       else
-         Put_Line("  No RigidBody component");
+         Put_Line("  Quad: Not Initialized");
       end if;
 
-      if AABB_Comp /= null then
-         declare
-            B : AABB_T renames AABB_T(AABB_Comp.all);
-         begin
-            Put_Line("  AABB:");
-            Put_Line("    Left: " & Float'Image(B.Left));
-            Put_Line("    Bottom: " & Float'Image(B.Bottom));
-            Put_Line("    Right: " & Float'Image(B.Right));
-            Put_Line("    Top: " & Float'Image(B.Top));
-         end;
+      if Texture /= null then
+         Put_Line("  Texture: Width(" & Integer'Image(Texture_T(Texture.all).Width) & "), Height(" &
+                   Integer'Image(Texture_T(Texture.all).Height) & ")");
       else
-         Put_Line("  No AABB component");
+         Put_Line("  Texture: Not Initialized");
       end if;
 
-      if Collision_Comp /= null then
-         declare
-            C : Collision_Params_T renames Collision_Params_T(Collision_Comp.all);
-         begin
-            Put_Line("  Collision_Params:");
-            Put_Line("    Collision_Enabled: " & Boolean'Image(C.Collision_Enabled));
-            Put_Line("    Destroy_On_Collision: " & Boolean'Image(C.Destroy_On_Collision));
-            Put_Line("    Collision_Occurred: " & Boolean'Image(C.Collision_Occurred));
-            Put_Line("    Wall_Collision: " & Boolean'Image(C.Wall_Collision));
-         end;
+      if Animation /= null then
+         Put_Line("  Animation: Current State(" & Entity_State'Image(Animation_Component_T(Animation.all).Current) & ")");
       else
-         Put_Line("  No Collision_Params component");
+         Put_Line("  Animation: Not Initialized");
       end if;
-      New_Line;
-   end Print_Entity;
-
-   procedure Render_Entities(Manager : access Entity_Manager_T) is
-      Width  : constant Integer := 800;
-      Height : constant Integer := 600;
-      Title  : Unbounded_String := To_Unbounded_String("Game Window");
-      GameWindow : Window_Access;
-      Buffer : Win32.Byte_Array_Access := new Win32.Byte_Array(0 .. Width * Height * 4);
-      SkyBlue : Color := (R => 135, G => 206, B => 236, A => 255);
-      Start_Time, Stop_Time : Time;
-      Elapsed_Time : Time_Span;
-      Render : Render_T := (Width, Height, Buffer);
-      Mover : Mover_T := (Width, Height); -- Initialize the Movement system
-      Collider : Collision_T := (Width, Height); -- Initialize the Collision system
-      Has_Msg : Boolean := True;
-      Message : MSG_Access := new MSG;
-      Lp_Result : LRESULT;
-   begin
-      GameWindow := New_Window(IC.int(Width), IC.int(Height), Title);
-      Put_Line("Start Engine");
-
-      -- Initialize Start_Time before the loop
-      Start_Time := Clock;
-
-      while Has_Msg loop
-         Stop_Time := Clock;
-         Elapsed_Time := Stop_Time - Start_Time;
-         Start_Time := Stop_Time;
-         Lp_Result := Dispatch_Message(Message);
-         Has_Msg := Get_Message(Message, System.Null_Address, 0, 0);
-
-            -- Debugging output to check for missing components
-         for Entity of Manager.Entities loop
-            if Entity.Get_Component(Transform_T'Tag) = null then
-               Put_Line("Entity ID:" & Entity.Id & " is missing Transform component");
-            end if;
-            if Entity.Get_Component(Rigidbody_T'Tag) = null then
-               Put_Line("Entity ID:" & Entity.Id & " is missing RigidBody component");
-            end if;
-            if Entity.Get_Component(AABB_T'Tag) = null then
-               Put_Line("Entity ID:" & Entity.Id & " is missing AABB component");
-            end if;
-            if Entity.Get_Component(Collision_Params_T'Tag) = null then
-               Put_Line("Entity ID:" & Entity.Id & " is missing Collision_Params component");
-            end if;
-            -- Add checks for other required components as needed
-         end loop;
-
-         -- Update the Movement system
-         Mover.Execute(To_Duration(Elapsed_Time), Manager);
-
-         -- Update the Collision system
-         Collider.Execute(To_Duration(Elapsed_Time), Manager);
-
-         Manager.Update;
-         Clear_Screen(Buffer.all, Graphics.Color.Blue, Width, Height);
-         Render.Execute(To_Duration(Elapsed_Time), Manager);
-         Draw_Buffer(Buffer.all'Address);
-      end loop;
-   end Render_Entities;
+   end Print_Entity_Info;
 
 begin
-   -- Load configuration from INI file
-   Load_Config(Manager, "C:\Users\zai\Documents\SPRING 2025\milestone project\Active Group Git\PSU.Ada.GameEngine\src\tests\Config Tests\entities.ini");
+   -- Load configuration from INI file and initialize systems
+   Load_Config(Manager, "..\src\tests\Config Tests\entities.ini", Window_Width, Window_Height, Window_Color, User_Input_System);
 
    -- Update the manager to process any pending entities
    Manager.Update;
 
-   -- Print out the components of each entity
+   -- Print initialized entities and components
+   Put_Line("Initialized Entities and Components:");
    for Entity of Manager.Entities loop
-      Print_Entity(Entity);
+      Print_Entity_Info(Entity);
    end loop;
 
-
-   -- Render the entities to the window
-   Render_Entities(Manager'Access);
-
+   -- Initialize and start the game engine systems
+   Initialize_Systems(Manager, Window_Width, Window_Height, Window_Color, User_Input_System);
 end ECS_Config_Window_System_Test;

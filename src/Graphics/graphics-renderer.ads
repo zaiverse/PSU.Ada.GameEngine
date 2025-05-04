@@ -52,7 +52,13 @@ package Graphics.Renderer is
    procedure Draw_String(img : in out Byte_Array; X,Y : Integer; Width, Height : Integer; S : in String; Color : Graphics.Color.Color; Screen_Width, Screen_Height : Natural);
    
    procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height : Integer; Screen_Width, Screen_Height : Natural);
-   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height,StartX,StartY : Integer; Screen_Width, Screen_Height,Image_Width : Natural);
+   procedure Draw_Image_To_Buffer(
+      buffer        : in out Byte_Array;
+      img           : in out Storage_Array_Access;
+      X, Y          : Integer;
+      Desired_Width, Desired_Height : Integer;
+      StartX, StartY : Integer;
+      Screen_Width, Screen_Height, Image_Width, Image_Height : Natural);
 
 
    generic

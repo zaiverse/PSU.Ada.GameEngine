@@ -12,12 +12,13 @@ package body ECS.System.User_Input is
       Mouse_Callbacks(Key) := Callback;
    end Register_Mouse_Callback;
 
-   overriding procedure Execute ( Self      : in out User_Input_T;
-                       Dt        : Duration;
-                       Manager   : access Entity_Manager_T'Class) is
-   Trans    : Component_Access := Self.Player_Entity.all.Get_Component(Transform_T'Tag);
-   T renames Transform_T(Trans.all);
-   Event : Event_T := Get_Next_Event(Self.Handler.all);
+   overriding procedure Execute ( 
+      Self      : in out User_Input_T;
+      Dt        : Duration;
+      Manager   : access Entity_Manager_T'Class) is
+      Trans    : Component_Access := Self.Player_Entity.all.Get_Component(Transform_T'Tag);
+      T renames Transform_T(Trans.all);
+      Event : Event_T := Get_Next_Event(Self.Handler.all);
    begin
       case Event.EventType is
          when ECS.Event.KeyDown =>

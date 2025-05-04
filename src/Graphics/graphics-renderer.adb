@@ -358,57 +358,70 @@ end Draw_String;
 
    end Draw_Image_To_Buffer;
 
-
-   procedure Draw_Image_To_Buffer(buffer : in out Byte_Array; img: in out Storage_Array_Access; X,Y,Width,Height,StartX,StartY : Integer; Screen_Width, Screen_Height,Image_Width : Natural) is
-
+   procedure Draw_Image_To_Buffer(
+      buffer        : in out Byte_Array;
+      img           : in out Storage_Array_Access;
+      X, Y          : Integer;
+      Desired_Width, Desired_Height : Integer;
+      StartX, StartY : Integer;
+      Screen_Width, Screen_Height, Image_Width, Image_Height : Natural)
+   is
       function Blend_Color_Values (A, B, Alpha : Float) return Float is
       begin
          return A * Alpha + B * (1.0 - Alpha);
       end Blend_Color_Values;
-   Img_Channel_Offset : constant Natural := 1;
+
+      Img_Channel_Offset : constant Natural := 1;
+      --  Scale_X : Float := Float(Desired_Width) / Float(Image_Width);
+      --  Scale_Y : Float := Float(Desired_Height) / Float(Image_Height);
    begin
+      --  Put_Line("Drawing image to buffer with parameters:");
+      --  Put_Line("X: " & Integer'Image(X) & ", Y: " & Integer'Image(Y));
+      --  Put_Line("Desired Width: " & Integer'Image(Desired_Width) & ", Desired Height: " & Integer'Image(Desired_Height));
+      --  Put_Line("StartX: " & Integer'Image(StartX) & ", StartY: " & Integer'Image(StartY));
+      --  Put_Line("Screen Width: " & Natural'Image(Screen_Width) & ", Screen Height: " & Natural'Image(Screen_Height));
+      --  Put_Line("Image Width: " & Natural'Image(Image_Width) & ", Image Height: " & Natural'Image(Image_Height));
 
-      for I in 0 .. (Height - 1) loop
-         begin
-            for J in 0 .. (Width - 1) loop
-               declare
-                  Img_Index : Natural := ((StartY + I) * Image_Width + (StartX + J)) * 4 + Img_Channel_Offset;
-                  -- need to offset the buffer index by the x and y values            
-                  Buffer_Index : Integer := ((Y + I) * Screen_Width + (X + J) ) * 4;
-                  New_Red_Value, New_Green_Value, New_Blue_Value, New_Alpha_Value : Float;
-                  Original_Red_Value, Original_Green_Value, Original_Blue_Value : Float;
-                  Blended_Red, Blended_Green, Blended_Blue : Float;
+      for I in 0 .. (Desired_Height - 1) loop
+         for J in 0 .. (Desired_Width - 1) loop
+            declare
+               --  Img_X : Integer := Integer(Float(J) / Scale_X);
+               --  Img_Y : Integer := Integer(Float(I) / Scale_Y);
+               Img_Index : Natural := ((StartY + I) * Image_Width + (StartX + J)) * 4 + Img_Channel_Offset;
+               Buffer_Index : Integer := ((Y + I) * Screen_Width + (X + J)) * 4;
+               New_Red_Value, New_Green_Value, New_Blue_Value, New_Alpha_Value : Float;
+               Original_Red_Value, Original_Green_Value, Original_Blue_Value : Float;
+               Blended_Red, Blended_Green, Blended_Blue : Float;
+            begin
+               --  Put_Line("Img_Index: " & Natural'Image(Img_Index) & ", Buffer_Index: " & Integer'Image(Buffer_Index));
 
-               begin
-                  if (X + J > 0 and X + J < Screen_Width) and (Y + I > 0 and Y + I < Screen_Height) then
+               if Img_Index < img.all'Length and Buffer_Index < buffer'Length then
+                  Original_Red_Value := Float(buffer(Buffer_Index+2));
+                  Original_Green_Value := Float(buffer(Buffer_Index+1));
+                  Original_Blue_Value := Float(buffer(Buffer_Index));
 
-                     --  Put_Line("Buffer Index: " & Buffer_Index'Image & " Img Index: " & Img_Index'Image);
+                  New_Red_Value := Float(img.all(Storage_Offset(Img_Index)));
+                  New_Green_Value := Float(img.all(Storage_Offset(Img_Index + 1)));
+                  New_Blue_Value := Float(img.all(Storage_Offset(Img_Index + 2)));
+                  New_Alpha_Value := Float(img.all(Storage_Offset(Img_Index + 3))) / 255.0;
 
-                     Original_Red_Value := Float(buffer(Buffer_Index+2));
-                     Original_Green_Value := Float(buffer(Buffer_Index+1));
-                     Original_Blue_Value := Float(buffer(Buffer_Index));
+                  Blended_Red := Blend_Color_Values(New_Red_Value, Original_Red_Value, New_Alpha_Value);
+                  Blended_Green := Blend_Color_Values(New_Green_Value, Original_Green_Value, New_Alpha_Value);
+                  Blended_Blue := Blend_Color_Values(New_Blue_Value, Original_Blue_Value, New_Alpha_Value);
 
-                     New_Red_Value := Float(img.all(Storage_Offset(Img_Index)));
-                     New_Green_Value := Float(img.all(Storage_Offset(Img_Index+1)));
-                     New_Blue_Value := Float(img.all(Storage_Offset(Img_Index+2)));
-                     New_Alpha_Value := Float(img.all(Storage_Offset(Img_Index+3))) / 255.0;
-
-                     Blended_Red    := Blend_Color_Values(New_Red_Value, Original_Red_Value, New_Alpha_Value);
-                     Blended_Green  := Blend_Color_Values(New_Green_Value, Original_Green_Value, New_Alpha_Value);
-                     Blended_Blue   := Blend_Color_Values(New_Blue_Value, Original_Blue_Value, New_Alpha_Value);
-            
-                     buffer(Buffer_Index)    := Byte(Blended_Blue);
-                     buffer(Buffer_Index+1)  := Byte(Blended_Green);
-                     buffer(Buffer_Index+2)  := Byte(Blended_Red);
-                     buffer(Buffer_Index+3)  := Byte(255); -- The window buffer does not support alpha values
-
-                  end if;
-               end;
-            end loop;
-         end;
+                  buffer(Buffer_Index) := Byte(Blended_Blue);
+                  buffer(Buffer_Index + 1) := Byte(Blended_Green);
+                  buffer(Buffer_Index + 2) := Byte(Blended_Red);
+                  buffer(Buffer_Index + 3) := Byte(255); -- The window buffer does not support alpha values
+               else
+                  --  Put_Line("Index out of bounds: Img_Index = " & Natural'Image(Img_Index) & ", Buffer_Index = " & Integer'Image(Buffer_Index));
+                  null;
+               end if;
+            end;
+         end loop;
       end loop;
-
    end Draw_Image_To_Buffer;
+
 
    --  procedure Draw_Image_To_Window (img : Image) is
    --     use IC;
