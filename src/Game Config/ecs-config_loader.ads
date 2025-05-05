@@ -29,6 +29,7 @@ with Input_Callbacks; use Input_Callbacks;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 with ECS.Scene_Manager; use ECS.Scene_Manager;
+with Ada.Containers.Vectors;
 
 with Audio;
 
@@ -79,9 +80,15 @@ private
       Window_Color : in out Graphics.Color.Color
    );
 
-   procedure Handle_Audio_Properties(
-      Key : String;
-      Value : String);
+   --  procedure Handle_Audio_Properties(
+   --     Key : String;
+   --     Value : String);
+   procedure Handle_Scene_Properties(
+      Section_Name : String;
+      Key          : String;
+      Value        : String
+   );
+   function Parse_Entity_List(Entity_Names : String) return String_Vectors.Vector;
 
    procedure Handle_Entity_Texture_Properties(
       Entity        : Entity_Access;

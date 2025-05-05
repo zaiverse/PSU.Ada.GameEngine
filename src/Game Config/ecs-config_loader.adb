@@ -41,7 +41,7 @@ package body ECS.Config_Loader is
          end;
 
          -- Initialize AABB based on Transform and Quad components, but skip for Window section
-         if Section /= "Window" and section /= "Audio" then
+         if Section /= "Window" and then Ada.Strings.Fixed.Index(To_String(Section), "Scene.") = 0 then
             Initialize_AABB(Entity);
          end if;
       end loop;
@@ -70,9 +70,7 @@ package body ECS.Config_Loader is
       Player_Entity : Entity_Access;
    begin
 
-      -- Initialize Scene Manager with audio paths
-      Scene_Manager.Initialize("../Data/drumbattle.mp3", "../Data/background_music.mp3");
-      Scene_Manager.Set_Scene(Scene_Manager.Gameplay);
+      Scene_Manager.Set_Scene(Manager, Scene_Manager.Battle);
       -- Ensure all entities and components are initialized
       --User_Input_System := (Manager.GetEntity("Playe"), Event_Mgr, True, False);
 
@@ -156,14 +154,19 @@ package body ECS.Config_Loader is
          Clear_Screen(Buffer.all, Window_Color, Window_Width, Window_Height);
 
          -- Render the scene
-         Render.Execute(To_Duration(Elapsed_Time), Manager'Access);
+         for Entity of Manager.Entities loop
+            if Entity.Active then
+               -- Process and render the entity
+               Render.Execute(To_Duration(Elapsed_Time), Manager'Access);
+            end if;
+         end loop;
 
          -- Update the Animation system
          Animator.Execute(To_Duration(Elapsed_Time), Manager'Access);
          Draw_Buffer(Buffer.all'Address);
 
          -- Update Scene Manager
-         Scene_Manager.Update;
+         Scene_Manager.Update(Manager);
       end loop;
    end Initialize_Systems;
 
@@ -178,9 +181,13 @@ package body ECS.Config_Loader is
       Temp_Section_Name      : constant String := Ada.Strings.Fixed.Trim(Section_Name, Ada.Strings.Both);
    begin
       -- Trim and adjust the section name
-      if Temp_Section_Name = "Window" or Temp_Section_Name = "Controls" or Temp_Section_Name = "Audio" then
+      if Temp_Section_Name = "Window" or Temp_Section_Name = "Controls" then
          Section := To_Unbounded_String(Temp_Section_Name);
          Entity := null; -- Skip creating an entity for the Window section
+         return;
+      elsif Ada.Strings.Fixed.Index(Temp_Section_Name, "Scene.") = 1 then
+         Section := To_Unbounded_String(Temp_Section_Name);
+         Entity := null; -- Skip creating an entity for the Scene section
          return;
       end if;
 
@@ -193,6 +200,7 @@ package body ECS.Config_Loader is
 
       Section := To_Unbounded_String(Trimmed_Section_Name);
       Entity := Manager.AddEntity(Trimmed_Section_Name);
+      Entity.Active := False;
    end Parse_Section;
 
    procedure Parse_Key_Value(
@@ -209,9 +217,8 @@ package body ECS.Config_Loader is
    begin
       if Section = "Window" then
          Handle_Window_Properties(Key, Value, Window_Width, Window_Height, Window_Color);
-       elsif Section = "Audio" then
-         Put_Line("Handling audio key: " & Key & " with value: " & Value);
-         Handle_Audio_Properties(Key, Value);
+      elsif Ada.Strings.Fixed.Index(To_String(Section), "Scene.") = 1 then
+         Handle_Scene_Properties(To_String(Section), Key, Value);
       elsif Dot_Index /= 0 then
          declare
             Component_Name : constant String := Ada.Strings.Fixed.Head(Key, Dot_Index - 1);
@@ -265,21 +272,40 @@ package body ECS.Config_Loader is
       end case;
    end Handle_Window_Properties;
 
-   procedure Handle_Audio_Properties(Key : String; Value : String) is
-   Full_Path : constant String := "../" & Value;
+   procedure Handle_Scene_Properties(
+      Section_Name : String;
+      Key          : String;
+      Value        : String
+   ) is
+      Scene_Name : constant String := Ada.Strings.Fixed.Tail(Section_Name, Section_Name'Length - 6);
+      Scene_Type_Value : constant Scene_Type := Scene_Type'Value(Scene_Name);
+      Prefixed_Value : constant String := "../" & Value;
    begin
-      Put_Line("Handling audio property: " & Key & " with value: " & Full_Path);
       case Key is
-         when "Battle_Song" =>
-            Audio.Play_Audio(Full_Path);
-            Put_Line("Playing Battle Song: " & Full_Path);
          when "Background_Music" =>
-            Audio.Play_Audio(Full_Path);
-            Put_Line("Playing Background Music: " & Full_Path);
-         when others =>
-            null;
+            Scene_Infos(Scene_Type_Value).Background_Music := To_Unbounded_String(Prefixed_Value);
+         when "Battle_Song" =>
+            Scene_Infos(Scene_Type_Value).Battle_Song := To_Unbounded_String(Prefixed_Value);
+         when "Entities" =>
+            Scene_Infos(Scene_Type_Value).Entities := Parse_Entity_List(Value);
+         when others => null;
       end case;
-   end Handle_Audio_Properties;
+   end Handle_Scene_Properties;
+
+   function Parse_Entity_List(Entity_Names : String) return String_Vectors.Vector is
+      Entity_List  : String_Vectors.Vector;
+      Start_Idx    : Natural := Entity_Names'First;
+      Comma_Idx    : Natural;
+   begin
+      loop
+         Comma_Idx := Ada.Strings.Fixed.Index(Entity_Names, ",", Start_Idx);
+         exit when Comma_Idx = 0;
+         Entity_List.Append(To_Unbounded_String(Entity_Names(Start_Idx .. Comma_Idx - 1)));
+         Start_Idx := Comma_Idx + 1;
+      end loop;
+      Entity_List.Append(To_Unbounded_String(Entity_Names(Start_Idx .. Entity_Names'Last)));
+      return Entity_List;
+   end Parse_Entity_List;
 
    procedure Move_Up_Callback(Manager : access Entity_Manager_T'Class; Dt : Duration; KeyDown : Boolean) is
       Action : constant String := "Move_Up";

@@ -12,6 +12,7 @@ package ecs.entity is
         Id         : Id_T;
         Components : Component_List.Vector;
         Destroyed  : Boolean;
+        Active     : Boolean;
     end record;
 
     type Entity_Access is access all Entity_T'Class;

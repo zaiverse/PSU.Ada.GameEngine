@@ -8,6 +8,7 @@ package body ecs.entity_manager is
                 Count => Entity_Count,
                 Id => Entity_Type,
                 Destroyed => False,
+                Active => False,
                 Components => Component_List.Empty_Vector
                 );
   begin
