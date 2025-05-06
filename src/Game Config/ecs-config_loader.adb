@@ -68,8 +68,30 @@ package body ECS.Config_Loader is
       Lp_Result : LRESULT;
       Event_Mgr : Platform_Event_Handler_Access := new Platform_Event_Handler;
       Player_Entity : Entity_Access;
+      Player_Transform : Component_Access;
+      MainMenuText : constant Entity_Access := Manager.AddEntity("Menuu");
    begin
+      MainMenuText.Add_Component(new Transform_T'(
+         Position => (X => 100.0, Y => 100.0),
+         Velocity => (X => 0.0, Y => 0.0), -- Default velocity
+         Rotation => 0.0                   -- Default rotation
+      ));
+      MainMenuText.Add_Component(new Text_T'(Text => To_Unbounded_String ("PRESS KEY R TO START"), C => Graphics.Color.White));
 
+      -- Add Collision_Params component
+      MainMenuText.Add_Component(new Collision_Params_T'(
+         Collision_Enabled    => False, -- Set to True if collision should be enabled
+         Destroy_On_Collision => False, -- Set to True if the entity should be destroyed on collision
+         Collision_Occurred   => False, -- This will be updated when a collision occurs
+         Wall_Collision       => False  -- Set to True if wall collision should be considered
+      ));
+
+      Scene_Infos(Scene_Type'Value("Main_Menu")).Entities.Append(To_Unbounded_String("Menuu"));
+      Scene_Infos(Scene_Type'Value("Main_Menu")).Entities.Append(To_Unbounded_String("Backg"));
+      
+      -- Set the MainMenuText entity to be active only in the Main_Menu scene
+      MainMenuText.Active := True;
+      Scene_Manager.Initialize(Manager);
       Scene_Manager.Set_Scene(Manager, Scene_Manager.Battle);
       -- Ensure all entities and components are initialized
       --User_Input_System := (Manager.GetEntity("Playe"), Event_Mgr, True, False);
@@ -167,6 +189,7 @@ package body ECS.Config_Loader is
 
          -- Update Scene Manager
          Scene_Manager.Update(Manager);
+         
       end loop;
    end Initialize_Systems;
 
@@ -201,6 +224,7 @@ package body ECS.Config_Loader is
       Section := To_Unbounded_String(Trimmed_Section_Name);
       Entity := Manager.AddEntity(Trimmed_Section_Name);
       Entity.Active := False;
+
    end Parse_Section;
 
    procedure Parse_Key_Value(
@@ -282,10 +306,14 @@ package body ECS.Config_Loader is
       Prefixed_Value : constant String := "../" & Value;
    begin
       case Key is
+         when "Menu_Song" =>
+            Scene_Infos(Scene_Type_Value).Menu_Song := To_Unbounded_String(Prefixed_Value);
          when "Background_Music" =>
             Scene_Infos(Scene_Type_Value).Background_Music := To_Unbounded_String(Prefixed_Value);
          when "Battle_Song" =>
             Scene_Infos(Scene_Type_Value).Battle_Song := To_Unbounded_String(Prefixed_Value);
+         when "Gameover_Song" =>
+            Scene_Infos(Scene_Type_Value).Gameover_Song := To_Unbounded_String(Prefixed_Value);
          when "Entities" =>
             Scene_Infos(Scene_Type_Value).Entities := Parse_Entity_List(Value);
          when others => null;
@@ -608,14 +636,32 @@ package body ECS.Config_Loader is
          New_Transform_Comp := Transform_Comp;
       end if;
 
+      Put_Line("");
       case Property_Name is
-         when "Position.X" => Transform_T(New_Transform_Comp.all).Position.X := Float'Value(Value);
-         when "Position.Y" => Transform_T(New_Transform_Comp.all).Position.Y := Float'Value(Value);
-         when "Velocity.X" => Transform_T(New_Transform_Comp.all).Velocity.X := Float'Value(Value);
-         when "Velocity.Y" => Transform_T(New_Transform_Comp.all).Velocity.Y := Float'Value(Value);
-         when "Rotation" => Transform_T(New_Transform_Comp.all).Rotation := Float'Value(Value);
-         when others => null;
+         when "Position.X" =>
+            Transform_T(New_Transform_Comp.all).Position.X := Float'Value(Value);
+            Put_Line("Set Position.X for entity " & Entity.Id & " to " & Value);
+         when "Position.Y" =>
+            Transform_T(New_Transform_Comp.all).Position.Y := Float'Value(Value);
+            Put_Line("Set Position.Y for entity " & Entity.Id & " to " & Value);
+         when "Velocity.X" =>
+            Transform_T(New_Transform_Comp.all).Velocity.X := Float'Value(Value);
+            Put_Line("Set Velocity.X for entity " & Entity.Id & " to " & Value);
+         when "Velocity.Y" =>
+            Transform_T(New_Transform_Comp.all).Velocity.Y := Float'Value(Value);
+            Put_Line("Set Velocity.Y for entity " & Entity.Id & " to " & Value);
+         when "Rotation" =>
+            Transform_T(New_Transform_Comp.all).Rotation := Float'Value(Value);
+            Put_Line("Set Rotation for entity " & Entity.Id & " to " & Value);
+         when others =>
+            null;
       end case;
+
+      -- Debug output to verify the current position after setting
+      Put_Line("Current position for entity " & Entity.Id & ": ("
+               & GameMath.Vec2'Image(Transform_T(New_Transform_Comp.all).Position) & ")");
+      Put_Line("");
+
    end Handle_Transform_Properties;
 
    procedure Handle_RigidBody_Properties(

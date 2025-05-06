@@ -81,8 +81,6 @@ package ECS.Component is
       TotFrame    : Integer   := 0;
    end record;
 
-   
-
    type Single_Animation_Access  is access all Single_Animation_T;
    type Texture_Access           is access all Texture_T;
    type Animation_Map            is array (Entity_State) of Single_Animation_Access;

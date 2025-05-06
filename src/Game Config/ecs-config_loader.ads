@@ -24,7 +24,6 @@ with ECS.Event; use ECS.Event;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Ada.Text_IO; use Ada.Text_IO;
-with Input_Callbacks; use Input_Callbacks;
 
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;

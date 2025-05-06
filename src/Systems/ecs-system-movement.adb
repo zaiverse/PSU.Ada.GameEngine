@@ -14,24 +14,24 @@ package body ECS.System.Movement is
             
             begin
                if Trans = null then
-                  Put_Line ("No Transform on entity " & Entity.all.Id);
+                  --Put_Line ("No Transform on entity " & Entity.all.Id);
                   return;
                end if;
                if Rigidbodies = null then
-                  Put_Line ("No Rigidbodies on entity " & Entity.all.Id);
+                  --Put_Line ("No Rigidbodies on entity " & Entity.all.Id);
                   return;
                end if;
                if AABB = null then 
-                  Put_Line ("No AABB on entity " & Entity.all.Id);
+                  --Put_Line ("No AABB on entity " & Entity.all.Id);
                   return;
                end if;
                if Quad = null then 
-                  Put_Line ("No Quad on entity " & Entity.all.Id);
+                  --Put_Line ("No Quad on entity " & Entity.all.Id);
                   return;
                end if;
 
                if Collision = null then
-                  Put_Line ("No Collision Parameters on entity " & Entity.all.Id);
+                  --Put_Line ("No Collision Parameters on entity " & Entity.all.Id);
                   return;
                end if;
 

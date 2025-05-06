@@ -63,43 +63,45 @@ package body ECS.System.Render is
                    Manager    : access Entity_Manager_T'Class ) is
 begin
    for Entity of Manager.all.Entities loop
-      declare
-         Transform   : Component_Access   := Entity.all.Get_Component(Transform_T'Tag);
-         Circle      : Component_Access   := Entity.all.Get_Component(Circle_T'Tag);
-         Quad        : Component_Access   := Entity.all.Get_Component(Quad_T'Tag);
-         Text        : Component_Access   := Entity.all.Get_Component(Text_T'Tag);
-         Texture     : Component_Access   := Entity.all.Get_Component(Texture_T'Tag);
-         Animation   : Component_Access   := Entity.all.Get_Component(Animation_Component_T'Tag);
-         Drawn       : Boolean            := False; -- Flag to track if the entity has been drawn
-      begin
-         if Transform /= null then
-            -- Draw components if they exist
-            if Circle /= null then
-               Self.Draw_Circle(Transform, Circle);
-               Drawn := True;
-            end if;
-
-            if Quad /= null and not Drawn then
-               if Animation /= null then
-                  Self.Draw_Animated_Texture(Transform, Animation, Quad);
-                  Drawn := True;
-               elsif Texture /= null then
-                  Self.Draw_Static_Texture(Transform, Texture, Quad);
+      if Entity.Active then
+         declare
+            Transform   : Component_Access   := Entity.all.Get_Component(Transform_T'Tag);
+            Circle      : Component_Access   := Entity.all.Get_Component(Circle_T'Tag);
+            Quad        : Component_Access   := Entity.all.Get_Component(Quad_T'Tag);
+            Text        : Component_Access   := Entity.all.Get_Component(Text_T'Tag);
+            Texture     : Component_Access   := Entity.all.Get_Component(Texture_T'Tag);
+            Animation   : Component_Access   := Entity.all.Get_Component(Animation_Component_T'Tag);
+            Drawn       : Boolean            := False; -- Flag to track if the entity has been drawn
+         begin
+            if Transform /= null then
+               -- Draw components if they exist
+               if Circle /= null then
+                  Self.Draw_Circle(Transform, Circle);
                   Drawn := True;
                end if;
-            end if;
 
-            if not Drawn and Quad /= null then
-               Self.Draw_Rectangle(Transform, Quad);
-            end if;
+               if Quad /= null and not Drawn then
+                  if Animation /= null then
+                     Self.Draw_Animated_Texture(Transform, Animation, Quad);
+                     Drawn := True;
+                  elsif Texture /= null then
+                     Self.Draw_Static_Texture(Transform, Texture, Quad);
+                     Drawn := True;
+                  end if;
+               end if;
 
-            if Text /= null then
-               Self.Draw_Text(Transform, Text);
+               if not Drawn and Quad /= null then
+                  Self.Draw_Rectangle(Transform, Quad);
+               end if;
+
+               if Text /= null then
+                  Self.Draw_Text(Transform, Text);
+               end if;
+            else
+               Put_Line("Entity ID: " & Entity.all.Id & " missing Transform component.");
             end if;
-         else
-            Put_Line("Entity ID: " & Entity.all.Id & " missing Transform component.");
-         end if;
-      end;
+         end;
+      end if;
    end loop;
 end Execute;
 
